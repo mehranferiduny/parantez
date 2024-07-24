@@ -7,7 +7,7 @@ import { UserEntity } from '../user/entites/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProfileEntity } from '../user/entites/profile.entity';
-import { AuthMassege, BadRequestExceptionM, BadRequestExceptionMasseage } from 'src/common/enums/message.enum';
+import { AuthMassege, BadRequestExceptionMasseage } from 'src/common/enums/message.enum';
 
 @Injectable()
 export class AuthService {
