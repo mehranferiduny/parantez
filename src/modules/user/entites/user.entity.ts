@@ -1,6 +1,7 @@
 import { BassEntity } from "src/common/abestracs/bass.entity";
 import { EntityName } from "src/common/enums/entity.enum";
-import { Column, CreateDateColumn, Entity, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, UpdateDateColumn } from "typeorm";
+import { OtpEntity } from "./otp.entity";
 
 @Entity(EntityName.User)
 export class UserEntity extends BassEntity{
@@ -13,7 +14,11 @@ export class UserEntity extends BassEntity{
   username:string
   @Column({nullable:true})
   password:string
-
+  @Column({nullable:true})
+   otpId:string
+   @OneToOne(()=>OtpEntity,(otp)=>otp.user,{nullable:true})
+   @JoinColumn({name:"otpId"})
+   otp:OtpEntity
   @CreateDateColumn()
   created_at:Date
   @UpdateDateColumn()
