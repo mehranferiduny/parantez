@@ -15,7 +15,7 @@ import { OtpEntity } from '../user/entites/otp.entity';
 export class AuthService {
   constructor(
     @InjectRepository(UserEntity) private readonly userRepository:Repository<UserEntity>,
-    @InjectRepository(ProfileEntity) private readonly profileRepository:Repository<ProfileEntity>
+    @InjectRepository(ProfileEntity) private readonly profileRepository:Repository<ProfileEntity>,
     @InjectRepository(OtpEntity) private readonly otpRepository:Repository<OtpEntity>
   ){}
 
@@ -46,10 +46,14 @@ export class AuthService {
     const vlaidUsername= this.usernameValidat(method,username)
     let user:UserEntity=await this.chekExistUser(method,vlaidUsername)
     if(user) throw new UnauthorizedException(AuthMassege.ConfiltExistAcont)
+    if(method == AuthMethod.username) throw new BadRequestException(BadRequestExceptionMasseage.InValidRegisterData)  
       user= this.userRepository.create({
         [method]:username
     })
     user =await this.userRepository.save(user)
+        user.username=`US_${user.id}`
+       await this.userRepository.save(user) 
+
     const otp= await this.saveOtp(user.id)
     return{
         code:otp.code
@@ -63,6 +67,7 @@ export class AuthService {
     let otp=await this.otpRepository.findOneBy({userId})
     let expierCode:boolean=false
     if(otp){
+      if(otp.expiresIn > new Date()) throw new BadRequestException(BadRequestExceptionMasseage.InValidExpierCode)
       expierCode=true
       otp.code=code;
       otp.expiresIn=expiresIn
