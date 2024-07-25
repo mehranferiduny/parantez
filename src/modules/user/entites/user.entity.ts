@@ -15,7 +15,7 @@ export class UserEntity extends BassEntity{
   @Column({nullable:true})
   password:string
   @Column({nullable:true})
-   otpId:string
+   otpId:number
    @OneToOne(()=>OtpEntity,(otp)=>otp.user,{nullable:true})
    @JoinColumn({name:"otpId"})
    otp:OtpEntity

@@ -8,12 +8,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProfileEntity } from '../user/entites/profile.entity';
 import { AuthMassege, BadRequestExceptionMasseage } from 'src/common/enums/message.enum';
+import { randomInt } from 'crypto';
+import { OtpEntity } from '../user/entites/otp.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserEntity) private readonly userRepository:Repository<UserEntity>,
     @InjectRepository(ProfileEntity) private readonly profileRepository:Repository<ProfileEntity>
+    @InjectRepository(OtpEntity) private readonly otpRepository:Repository<OtpEntity>
   ){}
 
   userExistence(authDto:AuthDto){
@@ -32,6 +35,10 @@ export class AuthService {
     const vlaidUsername= this.usernameValidat(method,username)
     let user:UserEntity=await this.chekExistUser(method,vlaidUsername)
     if(!user) throw new UnauthorizedException(AuthMassege.AcontNotFind)
+      const otp=await this.saveOtp(user.id)
+    return{
+      code:otp.code
+    }
 
      
   }
@@ -39,6 +46,37 @@ export class AuthService {
     const vlaidUsername= this.usernameValidat(method,username)
     let user:UserEntity=await this.chekExistUser(method,vlaidUsername)
     if(user) throw new UnauthorizedException(AuthMassege.ConfiltExistAcont)
+      user= this.userRepository.create({
+        [method]:username
+    })
+    user =await this.userRepository.save(user)
+    const otp= await this.saveOtp(user.id)
+    return{
+        code:otp.code
+    }
+
+  }
+
+  async saveOtp(userId:number){
+    const code=randomInt(10000,99999).toString()
+    const expiresIn=new Date(Date.now()+(1000*60*2))
+    let otp=await this.otpRepository.findOneBy({userId})
+    let expierCode:boolean=false
+    if(otp){
+      expierCode=true
+      otp.code=code;
+      otp.expiresIn=expiresIn
+    }else{
+      otp= this.otpRepository.create({code,expiresIn,userId})
+    }
+    otp = await this.otpRepository.save(otp)
+    if(!expierCode){
+       await this.userRepository.update({id:userId},{
+        otpId:otp.id
+       })
+    }
+    return otp;
+
   }
   usernameValidat(method:AuthMethod,username:string){
     switch (method) {

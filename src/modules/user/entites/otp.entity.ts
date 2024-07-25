@@ -10,7 +10,7 @@ export class OtpEntity extends BassEntity{
    @Column()
    expiresIn:Date
    @Column()
-   userId:string
+   userId:number
    @OneToOne(()=>UserEntity,(user)=>user.otp,{onDelete:"CASCADE"})
    user:UserEntity
    
