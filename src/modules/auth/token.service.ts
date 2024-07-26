@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { PayloadToken } from "./types/payload";
+import { PayloadAcssesToken, PayloadToken } from "./types/payload";
 
 @Injectable()
 export class TokenServiec{
@@ -9,7 +9,7 @@ export class TokenServiec{
   ){}
   craeteToken(payload:PayloadToken){
     const token=this.jwtServiec.sign(payload,{
-      secret:process.env.JWT_SECRET,
+      secret:process.env.JWT_SECRET_OTP,
       expiresIn:60*2
     })
     return token
@@ -17,7 +17,20 @@ export class TokenServiec{
 
   verifyToken(token:string):PayloadToken{
     return this.jwtServiec.verify(token,{
-      secret:process.env.JWT_SECRET,
+      secret:process.env.JWT_SECRET_OTP,
+    })
+  }
+  craeteAcssesToken(payload:PayloadAcssesToken){
+    const token=this.jwtServiec.sign(payload,{
+      secret:process.env.JWT_SECRET_ACSSES,
+      expiresIn:'1y'
+    })
+    return token
+  }
+
+  verifyAcssesToken(token:string):PayloadAcssesToken{
+    return this.jwtServiec.verify(token,{
+      secret:process.env.JWT_SECRET_ACSSES,
     })
   }
 }

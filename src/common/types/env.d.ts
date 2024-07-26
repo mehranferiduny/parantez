@@ -12,6 +12,7 @@ namespace NodeJS{
     DB_HOST:string
     //!Secret
     COOKIE_SECRET:string
-    JWT_SECRET:string
+    JWT_SECRET_OTP:string
+    JWT_SECRET_ACSSES:string
   } 
 }

@@ -92,9 +92,11 @@ export class AuthService {
     if(!otp) throw new UnauthorizedException(PublicMassege.TryAgin)
       if(otp.expiresIn < new Date()) throw new UnauthorizedException(AuthMassege.ExperidCode)
         if(otp.code !== code) throw new UnauthorizedException(PublicMassege.TryAgin)
+          const AcssesToken= this.tokenServiec.craeteAcssesToken({userId})
     return{
-      massege:PublicMassege.LogedIn
-      
+      massege:PublicMassege.LogedIn,
+      AcssesToken
+
     }      
   }
 
