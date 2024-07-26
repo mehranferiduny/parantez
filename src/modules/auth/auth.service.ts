@@ -150,4 +150,10 @@ export class AuthService {
     }
     return user
   }
+  async validatToken(token:string){
+    const {userId}=this.tokenServiec.verifyAcssesToken(token)
+    const user= await this.userRepository.findOneBy({id:userId})
+    if(!user) throw new UnauthorizedException(PublicMassege.TryLogin)
+      return user
+  }
 }
