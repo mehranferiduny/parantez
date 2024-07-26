@@ -5,5 +5,6 @@ export enum BadRequestExceptionMasseage{
 }
 export enum AuthMassege{
   AcontNotFind="حساب کاربری یافت نشد",
-  ConfiltExistAcont="حساب کاربری وجود دارد لطفا وارد شوید"
+  ConfiltExistAcont="حساب کاربری وجود دارد لطفا وارد شوید",
+  secessExsitCode="کد با موفقیت ذخیره شد"
 }

@@ -10,13 +10,15 @@ import { ProfileEntity } from '../user/entites/profile.entity';
 import { AuthMassege, BadRequestExceptionMasseage } from 'src/common/enums/message.enum';
 import { randomInt } from 'crypto';
 import { OtpEntity } from '../user/entites/otp.entity';
+import { TokenServiec } from './token.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserEntity) private readonly userRepository:Repository<UserEntity>,
     @InjectRepository(ProfileEntity) private readonly profileRepository:Repository<ProfileEntity>,
-    @InjectRepository(OtpEntity) private readonly otpRepository:Repository<OtpEntity>
+    @InjectRepository(OtpEntity) private readonly otpRepository:Repository<OtpEntity>,
+    private readonly tokenServiec:TokenServiec
   ){}
 
   userExistence(authDto:AuthDto){
@@ -37,6 +39,8 @@ export class AuthService {
     if(!user) throw new UnauthorizedException(AuthMassege.AcontNotFind)
       const otp=await this.saveOtp(user.id)
     return{
+        message:AuthMassege.secessExsitCode,
+      userId:user.id,
       code:otp.code
     }
 
@@ -56,6 +60,8 @@ export class AuthService {
 
     const otp= await this.saveOtp(user.id)
     return{
+      message:AuthMassege.secessExsitCode,
+      userId:user.id,
         code:otp.code
     }
 
