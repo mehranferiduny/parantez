@@ -16,3 +16,10 @@ export class AuthDto{
   @Length(3,100)
   username:string
 }
+
+export class ChekOtpDto{
+  @ApiProperty()
+  @Length(5,5)
+  @IsString()
+  code:string;
+}

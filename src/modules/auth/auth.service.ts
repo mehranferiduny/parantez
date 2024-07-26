@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
 import { AuthType } from './enums/type.enum';
 import { AuthMethod } from './enums/method.enum';
@@ -11,21 +11,27 @@ import { AuthMassege, BadRequestExceptionMasseage } from 'src/common/enums/messa
 import { randomInt } from 'crypto';
 import { OtpEntity } from '../user/entites/otp.entity';
 import { TokenServiec } from './token.service';
+import { Request, Response } from 'express';
+import { AuthRespons } from './types/response';
+import { CookieKeys } from 'src/common/enums/cookie.enum';
+import { REQUEST } from '@nestjs/core';
 
-@Injectable()
+@Injectable({scope:Scope.REQUEST})
 export class AuthService {
   constructor(
     @InjectRepository(UserEntity) private readonly userRepository:Repository<UserEntity>,
     @InjectRepository(ProfileEntity) private readonly profileRepository:Repository<ProfileEntity>,
     @InjectRepository(OtpEntity) private readonly otpRepository:Repository<OtpEntity>,
+    @Inject(REQUEST) private req:Request,
     private readonly tokenServiec:TokenServiec
   ){}
 
-  userExistence(authDto:AuthDto){
+ async userExistence(authDto:AuthDto,res:Response){
     const {method,type,username}=authDto
+    let result:AuthRespons;
     switch (type) {
-      case AuthType.login: return this.login(method,username)
-      case AuthType.register: return this.register(method,username)
+      case AuthType.login: result= await this.login(method,username); return this.sendRespons(res,result)
+      case AuthType.register: result= await this.register(method,username);return this.sendRespons(res,result)
       default:
         throw new UnauthorizedException()
     }
@@ -38,9 +44,10 @@ export class AuthService {
     let user:UserEntity=await this.chekExistUser(method,vlaidUsername)
     if(!user) throw new UnauthorizedException(AuthMassege.AcontNotFind)
       const otp=await this.saveOtp(user.id)
+    const token= this.tokenServiec.craeteToken({userId:user.id})
     return{
         message:AuthMassege.secessExsitCode,
-      userId:user.id,
+     token,
       code:otp.code
     }
 
@@ -57,14 +64,32 @@ export class AuthService {
     user =await this.userRepository.save(user)
         user.username=`US_${user.id}`
        await this.userRepository.save(user) 
-
+       const token= this.tokenServiec.craeteToken({userId:user.id})
     const otp= await this.saveOtp(user.id)
     return{
       message:AuthMassege.secessExsitCode,
-      userId:user.id,
-        code:otp.code
+        code:otp.code,
+        token
     }
 
+  }
+
+  async sendRespons(res:Response,result:AuthRespons){
+    const {code,token}=result
+    const expiresIn=new Date(Date.now()+(1000*60*2))
+    res.cookie(CookieKeys.Ojc_rec,token,{httpOnly:true,expires:expiresIn})
+    res.json({
+      message:AuthMassege.secessExsitCode,
+      code,
+    })
+  }
+
+  chekOtp(code:string){
+    const token=this.req.cookies?.[CookieKeys.Ojc_rec];
+    if(!token) throw new BadRequestException(AuthMassege.ExperidCode)
+      return{
+        token
+      }
   }
 
   async saveOtp(userId:number){
