@@ -9,3 +9,9 @@ export enum AuthMassege{
   secessExsitCode="کد با موفقیت ذخیره شد",
   ExperidCode="کد تایید منقضی شده است مجدادا تلاش نمایید"
 }
+export enum PublicMassege{
+  TryAgin="مجدادا تلاش نمایید",
+  TryLogin="دوباره وارد حساب کاربری خود شوید",
+  LogedIn="ورود موفقیت آمیز بود"
+
+}

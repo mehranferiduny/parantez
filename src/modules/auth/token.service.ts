@@ -14,4 +14,10 @@ export class TokenServiec{
     })
     return token
   }
+
+  verifyToken(token:string):PayloadToken{
+    return this.jwtServiec.verify(token,{
+      secret:process.env.JWT_SECRET,
+    })
+  }
 }

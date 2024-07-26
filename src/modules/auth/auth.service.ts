@@ -7,7 +7,7 @@ import { UserEntity } from '../user/entites/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProfileEntity } from '../user/entites/profile.entity';
-import { AuthMassege, BadRequestExceptionMasseage } from 'src/common/enums/message.enum';
+import { AuthMassege, BadRequestExceptionMasseage, PublicMassege } from 'src/common/enums/message.enum';
 import { randomInt } from 'crypto';
 import { OtpEntity } from '../user/entites/otp.entity';
 import { TokenServiec } from './token.service';
@@ -84,12 +84,18 @@ export class AuthService {
     })
   }
 
-  chekOtp(code:string){
+ async chekOtp(code:string){
     const token=this.req.cookies?.[CookieKeys.Ojc_rec];
     if(!token) throw new BadRequestException(AuthMassege.ExperidCode)
-      return{
-        token
-      }
+     const {userId}=this.tokenServiec.verifyToken(token)
+    const otp=await this.otpRepository.findOneBy({userId})
+    if(!otp) throw new UnauthorizedException(PublicMassege.TryAgin)
+      if(otp.expiresIn < new Date()) throw new UnauthorizedException(AuthMassege.ExperidCode)
+        if(otp.code !== code) throw new UnauthorizedException(PublicMassege.TryAgin)
+    return{
+      massege:PublicMassege.LogedIn
+      
+    }      
   }
 
   async saveOtp(userId:number){
