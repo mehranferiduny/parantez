@@ -12,6 +12,11 @@ export enum AuthMassege{
 export enum PublicMassege{
   TryAgin="مجدادا تلاش نمایید",
   TryLogin="دوباره وارد حساب کاربری خود شوید",
-  LogedIn="ورود موفقیت آمیز بود"
+  LogedIn="ورود موفقیت آمیز بود",
+  Creaeted="با موفقیت ایجاد شد",
 
+}
+
+export enum ConflictExceptionMassage{
+  categoryTitle="این دسته بندی از قبل ایجاد شده است"
 }
