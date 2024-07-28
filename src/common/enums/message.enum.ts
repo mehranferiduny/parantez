@@ -14,9 +14,17 @@ export enum PublicMassege{
   TryLogin="دوباره وارد حساب کاربری خود شوید",
   LogedIn="ورود موفقیت آمیز بود",
   Creaeted="با موفقیت ایجاد شد",
+  Updaeted="با موفقیت ویرایش شد",
+  Deleted="با موفقیت حذف شد",
 
 }
 
 export enum ConflictExceptionMassage{
   categoryTitle="این دسته بندی از قبل ایجاد شده است"
+}
+
+export enum NotFindMassege{
+  NotCategory="دسته بندی یافت نشد!",
+  NotPost="مقاله ای یافت نشد!",
+  NotUser="کاربری یافت نشد!",
 }
