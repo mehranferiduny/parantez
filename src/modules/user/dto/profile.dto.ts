@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from "@nestjs/swagger"
-import { Length } from "class-validator"
+import { IsEnum, Length } from "class-validator"
 import { Gender } from "../enum/gender.enum"
 
 
@@ -15,6 +15,7 @@ export class ProfileDto{
   @ApiPropertyOptional({nullable:true,format:"binary"})
   bg_Image:string
   @ApiPropertyOptional({nullable:true,enum:Gender})
+  @IsEnum(Gender)
   gander:string
   @ApiPropertyOptional({nullable:true})
   linkdin_profile:string
