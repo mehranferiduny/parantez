@@ -2,6 +2,7 @@ import { BassEntity } from "src/common/abestracs/bass.entity";
 import { EntityName } from "src/common/enums/entity.enum";
 import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, UpdateDateColumn } from "typeorm";
 import { OtpEntity } from "./otp.entity";
+import { ProfileEntity } from "./profile.entity";
 
 @Entity(EntityName.User)
 export class UserEntity extends BassEntity{
@@ -19,6 +20,13 @@ export class UserEntity extends BassEntity{
    @OneToOne(()=>OtpEntity,(otp)=>otp.user,{nullable:true})
    @JoinColumn({name:"otpId"})
    otp:OtpEntity
+
+   @Column({nullable:true})
+   profileId:number
+   @OneToOne(()=>ProfileEntity,(profile)=>profile.user,{nullable:true})
+   @JoinColumn({name:"profileId"})
+   profile:ProfileEntity
+
   @CreateDateColumn()
   created_at:Date
   @UpdateDateColumn()

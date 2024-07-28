@@ -1,6 +1,7 @@
 import { BassEntity } from "src/common/abestracs/bass.entity";
 import { EntityName } from "src/common/enums/entity.enum";
-import { Column, Entity } from "typeorm";
+import { Column, Entity, OneToOne } from "typeorm";
+import { UserEntity } from "./user.entity";
 
 @Entity(EntityName.Profile)
 export class ProfileEntity extends BassEntity{
@@ -20,6 +21,10 @@ export class ProfileEntity extends BassEntity{
    x_profile:string
    @Column({nullable:true})
    birthday:Date
+   @Column()
+   userId:number
+   @OneToOne(()=>UserEntity,(user)=>user.profile,{onDelete:"CASCADE"})
+   user:UserEntity
 
    
    
