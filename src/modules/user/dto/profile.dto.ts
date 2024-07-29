@@ -4,7 +4,7 @@ import { Gender } from "../enum/gender.enum"
 
 
 export class ProfileDto{
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({nullable:true})
   @Length(2,100)
   nik_name:string
   @ApiPropertyOptional({nullable:true})

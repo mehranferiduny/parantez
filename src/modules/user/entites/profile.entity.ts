@@ -5,7 +5,7 @@ import { UserEntity } from "./user.entity";
 
 @Entity(EntityName.Profile)
 export class ProfileEntity extends BassEntity{
-   @Column()
+   @Column({nullable:true})
    nik_name:string
    @Column({nullable:true})
    bio:string

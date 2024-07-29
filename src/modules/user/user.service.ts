@@ -17,7 +17,9 @@ export class UserService {
     @Inject(REQUEST) private readonly req:Request
   ){}
 
-  async chanfProfile(profileDto:ProfileDto){
+  async chanfProfile(profileDto:ProfileDto,file:any){
+    console.log(file)
+
     const {id:userId,profileId}=this.req.user;
     const profile=await this.profileRepositoty.findOneBy({userId})
     const {bio,birthday,gander,linkdin_profile,x_profile,nik_name}=profileDto
