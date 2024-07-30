@@ -21,7 +21,7 @@ export class ProfileDto{
   linkdin_profile:string
   @ApiPropertyOptional({nullable:true})
   x_profile:string
-  @ApiPropertyOptional({nullable:true,example:"1999-011-15T06:31:42.297Z"})
+  @ApiPropertyOptional({nullable:true,example:"1999-11-15T06:31:42.297Z"})
   birthday:Date
 
   

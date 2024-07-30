@@ -34,6 +34,6 @@ export class UserController {
       validators:[]
     })) file:any,
     @Body() profileDto:ProfileDto){
-    return this.userService.chanfProfile(profileDto,file)
+    return this.userService.changProfile(profileDto,file)
   }
 }

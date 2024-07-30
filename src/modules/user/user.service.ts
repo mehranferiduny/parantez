@@ -17,12 +17,19 @@ export class UserService {
     @Inject(REQUEST) private readonly req:Request
   ){}
 
-  async chanfProfile(profileDto:ProfileDto,file:any){
-    console.log(file)
+  async changProfile(profileDto:ProfileDto,file:any){
+    if(file?.bg_Image?.length >0){
+      let[image]=file?.bg_Image
+      profileDto.bg_Image=image.path
+    }
+    if(file?.imag_profile?.length >0){
+      let[image]=file?.imag_profile
+      profileDto.imag_profile=image.path
+    }
 
     const {id:userId,profileId}=this.req.user;
-    const profile=await this.profileRepositoty.findOneBy({userId})
-    const {bio,birthday,gander,linkdin_profile,x_profile,nik_name}=profileDto
+    let profile=await this.profileRepositoty.findOneBy({userId})
+    const {bio,birthday,gander,linkdin_profile,x_profile,nik_name,bg_Image,imag_profile}=profileDto
     if(profile){
       if(bio) profile.bio=bio;
       if(birthday && isDate(new Date(birthday))) profile.birthday=new Date(birthday);
@@ -30,16 +37,20 @@ export class UserService {
       if(nik_name) profile.nik_name=nik_name;
       if(linkdin_profile) profile.linkdin_profile=linkdin_profile;
       if(x_profile) profile.x_profile=x_profile;
+      if(imag_profile) profile.imag_profile=imag_profile;
+      if(bg_Image) profile.bg_Image=bg_Image;
 
     }else{
-         this.profileRepositoty.create({
+       profile=  this.profileRepositoty.create({
           bio,
           birthday,
           gander,
           linkdin_profile,
           x_profile,
           nik_name,
-          userId
+          userId,
+          bg_Image,
+          imag_profile
         })
     }
     await this.profileRepositoty.save(profile)

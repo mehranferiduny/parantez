@@ -1,6 +1,8 @@
+import { BadRequestException } from "@nestjs/common";
 import { Request } from "express";
 import { mkdirSync } from "fs";
 import { extname, join } from "path";
+import { InvalidFormatMassage } from "../enums/message.enum";
 
 export type MalterFile=Express.Multer.File
 export type CallbackDestination=(error: Error | null, destination: string) => void;
@@ -14,8 +16,16 @@ export function malterDestition(fildName:string){
   
 }
 export function malterFileName(req:Request,file:MalterFile,callback:CallbackDestination):void{
-  const ext=extname(file.originalname)
-  const nameFile=`${Date.now()}.${ext}`
+  const ext=extname(file.originalname).toLowerCase()
+  if(!validFornmatImage(ext)){
+    callback(new BadRequestException(InvalidFormatMassage.InvalidFormatImage),null)
+  }else{
+  const nameFile=`${Date.now()}${ext}`
   callback(null,nameFile)
+  }
   
+}
+
+function validFornmatImage(ext:string){
+  return ['.png','.jpg','.jpeg'].includes(ext)
 }
