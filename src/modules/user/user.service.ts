@@ -9,6 +9,7 @@ import { Request } from 'express';
 import { isDate, IsDate, isEnum } from 'class-validator';
 import { Gender } from './enum/gender.enum';
 import { ImageProfile } from './types/files';
+import { PublicMassege } from 'src/common/enums/message.enum';
 
 @Injectable({scope:Scope.REQUEST})
 export class UserService {
@@ -30,7 +31,9 @@ export class UserService {
 
     const {id:userId,profileId}=this.req.user;
     let profile=await this.profileRepositoty.findOneBy({userId})
-    const {bio,birthday,gander,linkdin_profile,x_profile,nik_name,bg_Image,imag_profile}=profileDto
+    const {bio,birthday,gander,linkdin_profile
+      ,x_profile,nik_name,bg_Image,imag_profile}=profileDto
+    console.log(profileDto)
     if(profile){
       if(bio) profile.bio=bio;
       if(birthday && isDate(new Date(birthday))) profile.birthday=new Date(birthday);
@@ -59,6 +62,9 @@ export class UserService {
           await this.userRepositoty.update({id:userId},{
             profileId:profile.id
           })
+    }
+    return {
+      message:PublicMassege.Updaeted
     }
   }
 
