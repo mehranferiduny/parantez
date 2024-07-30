@@ -3,6 +3,7 @@ import { Request } from "express";
 import { mkdirSync } from "fs";
 import { extname, join } from "path";
 import { InvalidFormatMassage } from "../enums/message.enum";
+import { diskStorage } from "multer";
 
 export type MalterFile=Express.Multer.File
 export type CallbackDestination=(error: Error | null, destination: string) => void;
@@ -28,4 +29,11 @@ export function malterFileName(req:Request,file:MalterFile,callback:CallbackDest
 
 function validFornmatImage(ext:string){
   return ['.png','.jpg','.jpeg'].includes(ext)
+}
+
+export function malterStoreg(filderName:string){
+  return diskStorage({
+    destination:malterDestition(filderName),
+    filename:malterFileName
+  })
 }

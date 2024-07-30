@@ -1,12 +1,13 @@
-import { Body, Controller, ParseFilePipe, Patch, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, ParseFilePipe, Patch, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { ProfileDto } from './dto/profile.dto';
 import { SwaggerConsumes } from 'src/common/enums/swagger-consumes.enum';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { malterDestition, malterFileName } from 'src/common/utils/multer.util';
+import { malterStoreg } from 'src/common/utils/multer.util';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import {  UploadedOptionFile } from 'src/common/decorators/uploadfile.decorator';
+import { ImageProfile } from './types/files';
 
 @Controller('user')
 @ApiTags("User")
@@ -22,18 +23,17 @@ export class UserController {
     {name:"bg_Image",maxCount:1}
   ],
   {
-    storage:diskStorage({
-      destination:malterDestition("profile-image"),
-      filename:malterFileName
-    })
+    storage:malterStoreg("profile-image")
   }
 ))
   changProfile(
-    @UploadedFiles(new ParseFilePipe({
-      fileIsRequired:false,
-      validators:[]
-    })) file:any,
+    @UploadedOptionFile()
+     file:ImageProfile,
     @Body() profileDto:ProfileDto){
     return this.userService.changProfile(profileDto,file)
+  }
+  @Get('profile')
+  profile(){
+    return this.userService.profile()
   }
 }
