@@ -14,6 +14,8 @@ namespace NodeJS{
     COOKIE_SECRET:string
     JWT_SECRET_OTP:string
     JWT_SECRET_ACSSES:string
+    JWT_SECRET_EMAIL:string
+    JWT_SECRET_PHONE:string
   } 
 }
 

@@ -8,6 +8,8 @@ export class OtpEntity extends BassEntity{
    @Column()
    code:string
    @Column()
+   mehtoad:string
+   @Column()
    expiresIn:Date
    @Column()
    userId:number

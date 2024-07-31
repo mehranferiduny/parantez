@@ -1,7 +1,8 @@
 export enum BadRequestExceptionMasseage{
   InValidLoginData="اطلاعات جهت ورود نادرست میباشد",
   InValidRegisterData="اطلاعات جهت ثبت نام نادرست میباشد",
-  InValidExpierCode="کد ارسال شده هنور معتبر میباشد"
+  InValidExpierCode="کد ارسال شده هنور معتبر میباشد",
+  BatTryAgen="مشکلی به وجود آمئه است مجددا تلاش نمایید"
 }
 export enum AuthMassege{
   AcontNotFind="حساب کاربری یافت نشد",
@@ -23,7 +24,8 @@ export enum InvalidFormatMassage{
   InvalidFormatImage="عکس انتخاب شده باید فرمت آن jpg یا png باشد."
 }
 export enum ConflictExceptionMassage{
-  categoryTitle="این دسته بندی از قبل ایجاد شده است"
+  categoryTitle="این دسته بندی از قبل ایجاد شده است",
+  email="این ایمیل در دیتابیس موجود میباشد"
 }
 
 export enum NotFindMassege{

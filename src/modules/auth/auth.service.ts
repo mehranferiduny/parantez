@@ -44,6 +44,8 @@ export class AuthService {
     let user:UserEntity=await this.chekExistUser(method,vlaidUsername)
     if(!user) throw new UnauthorizedException(AuthMassege.AcontNotFind)
       const otp=await this.saveOtp(user.id)
+    otp.mehtoad=method;
+    await this.otpRepository.save(otp)
     const token= this.tokenServiec.craeteToken({userId:user.id})
     return{
         message:AuthMassege.secessExsitCode,
@@ -93,6 +95,15 @@ export class AuthService {
       if(otp.expiresIn < new Date()) throw new UnauthorizedException(AuthMassege.ExperidCode)
         if(otp.code !== code) throw new UnauthorizedException(PublicMassege.TryAgin)
           const AcssesToken= this.tokenServiec.craeteAcssesToken({userId})
+        if(otp.mehtoad === AuthMethod.phone){
+          await this.userRepository.update({id:userId}{
+            verify_phone:true
+          })
+        }else if( otp.mehtoad === AuthMethod.email){
+          await this.userRepository.update({id:userId},{
+            verify_email:true
+          })
+        }
     return{
       massege:PublicMassege.LogedIn,
       AcssesToken

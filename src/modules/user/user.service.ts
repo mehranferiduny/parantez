@@ -1,4 +1,4 @@
-import { Inject, Injectable, Scope } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, Scope } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entites/user.entity';
 import { Repository } from 'typeorm';
@@ -9,14 +9,18 @@ import { Request } from 'express';
 import { isDate, IsDate, isEnum } from 'class-validator';
 import { Gender } from './enum/gender.enum';
 import { ImageProfile } from './types/files';
-import { PublicMassege } from 'src/common/enums/message.enum';
+import { ConflictExceptionMassage, PublicMassege } from 'src/common/enums/message.enum';
+import { AuthService } from '../auth/auth.service';
+import { TokenServiec } from '../auth/token.service';
 
 @Injectable({scope:Scope.REQUEST})
 export class UserService {
   constructor(
     @InjectRepository(UserEntity) private readonly userRepositoty:Repository<UserEntity>,
     @InjectRepository(ProfileEntity) private readonly profileRepositoty:Repository<ProfileEntity>,
-    @Inject(REQUEST) private readonly req:Request
+    @Inject(REQUEST) private readonly req:Request,
+    private readonly authService:AuthService,
+    private readonly tokenService:TokenServiec
   ){}
 
   async changProfile(profileDto:ProfileDto,file:ImageProfile){
@@ -74,5 +78,24 @@ export class UserService {
       where:{id},
       relations:['profile']
     })
+  }
+
+  async chenageEmail(email:string){
+    const {id}=this.req.user
+    const user=await this.userRepositoty.findOneBy({email})
+    if(user && user?.id !== id){
+      throw new ConflictException(ConflictExceptionMassage.email)
+    }else if(user && user?.id === id){
+      return {
+        message:PublicMassege.Updaeted 
+      }
+    }
+    user.new_email= email
+    const otp=await this.authService.saveOtp(user.id)
+    const token= this.tokenService.craeteEmailToken({email})
+    return{
+      code:otp.code,
+      token
+    }
   }
 }
