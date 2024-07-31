@@ -21,7 +21,9 @@ export enum PublicMassege{
 }
 
 export enum InvalidFormatMassage{
-  InvalidFormatImage="عکس انتخاب شده باید فرمت آن jpg یا png باشد."
+  InvalidFormatImage="عکس انتخاب شده باید فرمت آن jpg یا png باشد.",
+  InvalidEmail="ایمیل وارد شده صحیح نمیباشد",
+  InvalidPhone="شماره موبایل وارد شده صحیح نمیباشد",
 }
 export enum ConflictExceptionMassage{
   categoryTitle="این دسته بندی از قبل ایجاد شده است",

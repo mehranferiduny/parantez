@@ -15,6 +15,7 @@ import { Request, Response } from 'express';
 import { AuthRespons } from './types/response';
 import { CookieKeys } from 'src/common/enums/cookie.enum';
 import { REQUEST } from '@nestjs/core';
+import { CookieOptionToken } from 'src/common/utils/cookie.util';
 
 @Injectable({scope:Scope.REQUEST})
 export class AuthService {
@@ -78,8 +79,8 @@ export class AuthService {
 
   async sendRespons(res:Response,result:AuthRespons){
     const {code,token}=result
-    const expiresIn=new Date(Date.now()+(1000*60*2))
-    res.cookie(CookieKeys.Ojc_rec,token,{httpOnly:true,expires:expiresIn})
+   
+    res.cookie(CookieKeys.Ojc_rec,token,CookieOptionToken())
     res.json({
       message:AuthMassege.secessExsitCode,
       code,
@@ -96,7 +97,7 @@ export class AuthService {
         if(otp.code !== code) throw new UnauthorizedException(PublicMassege.TryAgin)
           const AcssesToken= this.tokenServiec.craeteAcssesToken({userId})
         if(otp.mehtoad === AuthMethod.phone){
-          await this.userRepository.update({id:userId}{
+          await this.userRepository.update({id:userId},{
             verify_phone:true
           })
         }else if( otp.mehtoad === AuthMethod.email){
