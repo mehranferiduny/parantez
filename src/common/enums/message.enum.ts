@@ -27,7 +27,8 @@ export enum InvalidFormatMassage{
 }
 export enum ConflictExceptionMassage{
   categoryTitle="این دسته بندی از قبل ایجاد شده است",
-  email="این ایمیل در دیتابیس موجود میباشد"
+  email="این ایمیل در دیتابیس موجود میباشد",
+  phone="این شماره در دیتابیس موجود میباشد",
 }
 
 export enum NotFindMassege{

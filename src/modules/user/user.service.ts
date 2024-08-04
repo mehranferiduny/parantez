@@ -85,6 +85,49 @@ export class UserService {
     })
   }
 
+  async chenagePhone(phone:string){
+    const {id}=this.req.user
+    const user=await this.userRepositoty.findOneBy({phone})
+    if(user && user?.id !== id){
+      throw new ConflictException(ConflictExceptionMassage.phone)
+    }else if(user && user?.id === id){
+      return {
+        message:PublicMassege.Updaeted 
+      }
+    }
+    await this.userRepositoty.update({id},{
+      new_phone:phone
+    })
+    const otp=await this.authService.saveOtp(id,AuthMethod.phone)
+    const token= this.tokenService.craetePhoneToken({phone})
+    return{
+      code:otp.code,
+      token
+    }
+  }
+
+  async verifyPhone(code:string){
+    const {new_phone,id:userId}=this.req.user;
+    const token=this.req.cookies?.[CookieKeys.Ojc_Phone];
+    if(!token) throw new BadRequestException(AuthMassege.ExperidCode)
+     const {phone}=this.tokenService.verifyPhoneToken(token)
+    if(phone !== new_phone) throw new BadRequestException(BadRequestExceptionMasseage.BatTryAgen)
+      const otp=await this.cheackOtp(userId,code)
+    if(otp.mehtoad !== AuthMethod.phone){
+      throw new BadRequestException(BadRequestExceptionMasseage.BatTryAgen)
+    }
+    await this.userRepositoty.update({id:userId},{
+      phone,
+      verify_phone:true,
+      new_phone:null
+    })
+    return{
+      message:PublicMassege.Updaeted
+    }
+
+   
+
+  }
   async chenageEmail(email:string){
     const {id}=this.req.user
     const user=await this.userRepositoty.findOneBy({email})
@@ -112,7 +155,7 @@ export class UserService {
     if(!token) throw new BadRequestException(AuthMassege.ExperidCode)
      const {email}=this.tokenService.verifyEmailToken(token)
     if(email !== new_email) throw new BadRequestException(BadRequestExceptionMasseage.BatTryAgen)
-      const otp=await this.cheackEmailOtp(userId,code)
+      const otp=await this.cheackOtp(userId,code)
     if(otp.mehtoad !== AuthMethod.email){
       throw new BadRequestException(BadRequestExceptionMasseage.BatTryAgen)
     }
@@ -128,7 +171,7 @@ export class UserService {
    
 
   }
-  async cheackEmailOtp(userId:number,code:string){
+  async cheackOtp(userId:number,code:string){
     const otp=await this.otpRepository.findOneBy({userId})
     if(!otp) throw new UnauthorizedException(PublicMassege.TryAgin)
       if(otp.expiresIn < new Date()) throw new UnauthorizedException(AuthMassege.ExperidCode)

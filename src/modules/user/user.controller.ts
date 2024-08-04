@@ -1,7 +1,7 @@
 import { Body, Controller, Get, ParseFilePipe, Patch, Post, Res, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { ChenageEmailDto, ProfileDto } from './dto/profile.dto';
+import { ChenageEmailDto, ChenagePhoneDto, ProfileDto } from './dto/profile.dto';
 import { SwaggerConsumes } from 'src/common/enums/swagger-consumes.enum';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { malterStoreg } from 'src/common/utils/multer.util';
@@ -42,6 +42,21 @@ export class UserController {
     return this.userService.profile()
   }
 
+  @Patch("cheng-phone")
+  async chenagePhone(@Body() chenagePhoneDto:ChenagePhoneDto,@Res() res:Response){
+    const {code,message,token}=await this.userService.chenagePhone(chenagePhoneDto.Phone)
+    if(message) return res.json({message})
+      res.cookie(CookieKeys.Ojc_Phone,token,CookieOptionToken())
+    res.json({
+      message:AuthMassege.secessExsitCode,
+      code
+    })
+  }
+
+  @Post('verify-phone')
+  verifayPhone(@Body() otpPhone:ChekOtpDto){
+    return this.userService.verifyPhone(otpPhone.code)
+  }
   @Patch("cheng-email")
   async chenageEmail(@Body() chenageEmailDto:ChenageEmailDto,@Res() res:Response){
     const {code,message,token}=await this.userService.chenageEmail(chenageEmailDto.email)
