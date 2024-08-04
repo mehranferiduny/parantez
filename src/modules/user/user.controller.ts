@@ -1,4 +1,4 @@
-import { Body, Controller, Get, ParseFilePipe, Patch, Res, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, ParseFilePipe, Patch, Post, Res, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { ChenageEmailDto, ProfileDto } from './dto/profile.dto';
@@ -12,6 +12,7 @@ import { Response } from 'express';
 import { CookieKeys } from 'src/common/enums/cookie.enum';
 import { CookieOptionToken } from 'src/common/utils/cookie.util';
 import { AuthMassege, PublicMassege } from 'src/common/enums/message.enum';
+import { ChekOtpDto } from '../auth/dto/auth.dto';
 
 @Controller('user')
 @ApiTags("User")
@@ -50,5 +51,10 @@ export class UserController {
       message:AuthMassege.secessExsitCode,
       code
     })
+  }
+
+  @Post('verify-email')
+  verifayEmail(@Body() otpEmail:ChekOtpDto){
+    return this.userService.verifyEmail(otpEmail.code)
   }
 }

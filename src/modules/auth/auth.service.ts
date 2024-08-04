@@ -44,9 +44,7 @@ export class AuthService {
     const vlaidUsername= this.usernameValidat(method,username)
     let user:UserEntity=await this.chekExistUser(method,vlaidUsername)
     if(!user) throw new UnauthorizedException(AuthMassege.AcontNotFind)
-      const otp=await this.saveOtp(user.id)
-    otp.mehtoad=method;
-    await this.otpRepository.save(otp)
+      const otp=await this.saveOtp(user.id,method)
     const token= this.tokenServiec.craeteToken({userId:user.id})
     return{
         message:AuthMassege.secessExsitCode,
@@ -68,7 +66,7 @@ export class AuthService {
         user.username=`US_${user.id}`
        await this.userRepository.save(user) 
        const token= this.tokenServiec.craeteToken({userId:user.id})
-    const otp= await this.saveOtp(user.id)
+    const otp= await this.saveOtp(user.id,method)
     return{
       message:AuthMassege.secessExsitCode,
         code:otp.code,
@@ -112,7 +110,7 @@ export class AuthService {
     }      
   }
 
-  async saveOtp(userId:number){
+  async saveOtp(userId:number,mehtoad:AuthMethod){
     const code=randomInt(10000,99999).toString()
     const expiresIn=new Date(Date.now()+(1000*60*2))
     let otp=await this.otpRepository.findOneBy({userId})
@@ -122,8 +120,9 @@ export class AuthService {
       expierCode=true
       otp.code=code;
       otp.expiresIn=expiresIn
+      otp.mehtoad=mehtoad
     }else{
-      otp= this.otpRepository.create({code,expiresIn,userId})
+      otp= this.otpRepository.create({code,expiresIn,userId,mehtoad})
     }
     otp = await this.otpRepository.save(otp)
     if(!expierCode){

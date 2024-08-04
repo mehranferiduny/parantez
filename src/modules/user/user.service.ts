@@ -1,4 +1,4 @@
-import { ConflictException, Inject, Injectable, Scope } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entites/user.entity';
 import { Repository } from 'typeorm';
@@ -9,15 +9,20 @@ import { Request } from 'express';
 import { isDate, IsDate, isEnum } from 'class-validator';
 import { Gender } from './enum/gender.enum';
 import { ImageProfile } from './types/files';
-import { ConflictExceptionMassage, PublicMassege } from 'src/common/enums/message.enum';
+import { AuthMassege, BadRequestExceptionMasseage, ConflictExceptionMassage, PublicMassege } from 'src/common/enums/message.enum';
 import { AuthService } from '../auth/auth.service';
 import { TokenServiec } from '../auth/token.service';
+import { AuthMethod } from '../auth/enums/method.enum';
+import { CookieKeys } from 'src/common/enums/cookie.enum';
+import { OtpEntity } from './entites/otp.entity';
 
 @Injectable({scope:Scope.REQUEST})
 export class UserService {
+
   constructor(
     @InjectRepository(UserEntity) private readonly userRepositoty:Repository<UserEntity>,
     @InjectRepository(ProfileEntity) private readonly profileRepositoty:Repository<ProfileEntity>,
+    @InjectRepository(OtpEntity) private readonly otpRepository:Repository<OtpEntity>,
     @Inject(REQUEST) private readonly req:Request,
     private readonly authService:AuthService,
     private readonly tokenService:TokenServiec
@@ -90,12 +95,44 @@ export class UserService {
         message:PublicMassege.Updaeted 
       }
     }
-    user.new_email= email
-    const otp=await this.authService.saveOtp(user.id)
+    await this.userRepositoty.update({id},{
+      new_email:email
+    })
+    const otp=await this.authService.saveOtp(id,AuthMethod.email)
     const token= this.tokenService.craeteEmailToken({email})
     return{
       code:otp.code,
       token
     }
+  }
+
+  async verifyEmail(code:string){
+    const {new_email,id:userId}=this.req.user;
+    const token=this.req.cookies?.[CookieKeys.Ojc_Email];
+    if(!token) throw new BadRequestException(AuthMassege.ExperidCode)
+     const {email}=this.tokenService.verifyEmailToken(token)
+    if(email !== new_email) throw new BadRequestException(BadRequestExceptionMasseage.BatTryAgen)
+      const otp=await this.cheackEmailOtp(userId,code)
+    if(otp.mehtoad !== AuthMethod.email){
+      throw new BadRequestException(BadRequestExceptionMasseage.BatTryAgen)
+    }
+    await this.userRepositoty.update({id:userId},{
+      email,
+      verify_email:true,
+      new_email:null
+    })
+    return{
+      message:PublicMassege.Updaeted
+    }
+
+   
+
+  }
+  async cheackEmailOtp(userId:number,code:string){
+    const otp=await this.otpRepository.findOneBy({userId})
+    if(!otp) throw new UnauthorizedException(PublicMassege.TryAgin)
+      if(otp.expiresIn < new Date()) throw new UnauthorizedException(AuthMassege.ExperidCode)
+        if(otp.code !== code) throw new UnauthorizedException(PublicMassege.TryAgin)
+    return otp;      
   }
 }

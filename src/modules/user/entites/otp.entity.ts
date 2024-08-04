@@ -7,7 +7,7 @@ import { UserEntity } from "./user.entity";
 export class OtpEntity extends BassEntity{
    @Column()
    code:string
-   @Column()
+   @Column({nullable:true})
    mehtoad:string
    @Column()
    expiresIn:Date

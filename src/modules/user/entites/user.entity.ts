@@ -13,7 +13,7 @@ export class UserEntity extends BassEntity{
   new_email:string
   @Column({nullable:true,default:false})
   verify_email:boolean
-  @Column({unique:true,nullable:true})
+  
   @Column({nullable:true,default:false})
   verify_phone:boolean
   @Column({unique:true,nullable:true})
