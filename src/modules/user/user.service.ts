@@ -178,4 +178,22 @@ export class UserService {
         if(otp.code !== code) throw new UnauthorizedException(PublicMassege.TryAgin)
     return otp;      
   }
+
+  async chenagUsername(username:string){
+    const {id}=this.req.user
+    const user=await this.userRepositoty.findOneBy({username})
+    if(user && user?.id !== id){
+      throw new ConflictException(ConflictExceptionMassage.username)
+    }else if(user && user?.id === id){
+      return {
+        message:PublicMassege.Updaeted 
+      }
+    }
+    await this.userRepositoty.update({id},{
+      username
+    })
+    return {
+      message:PublicMassege.Updaeted 
+    }
+  }
 }

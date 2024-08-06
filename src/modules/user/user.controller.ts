@@ -1,7 +1,7 @@
 import { Body, Controller, Get, ParseFilePipe, Patch, Post, Res, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { ChenageEmailDto, ChenagePhoneDto, ProfileDto } from './dto/profile.dto';
+import { ChenageEmailDto, ChenagePhoneDto, ChenageUsernameDto, ProfileDto } from './dto/profile.dto';
 import { SwaggerConsumes } from 'src/common/enums/swagger-consumes.enum';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { malterStoreg } from 'src/common/utils/multer.util';
@@ -43,6 +43,7 @@ export class UserController {
   }
 
   @Patch("cheng-phone")
+  @ApiConsumes(SwaggerConsumes.UrlEncoded,SwaggerConsumes.Json)
   async chenagePhone(@Body() chenagePhoneDto:ChenagePhoneDto,@Res() res:Response){
     const {code,message,token}=await this.userService.chenagePhone(chenagePhoneDto.Phone)
     if(message) return res.json({message})
@@ -54,10 +55,12 @@ export class UserController {
   }
 
   @Post('verify-phone')
+  @ApiConsumes(SwaggerConsumes.UrlEncoded,SwaggerConsumes.Json)
   verifayPhone(@Body() otpPhone:ChekOtpDto){
     return this.userService.verifyPhone(otpPhone.code)
   }
   @Patch("cheng-email")
+  @ApiConsumes(SwaggerConsumes.UrlEncoded,SwaggerConsumes.Json)
   async chenageEmail(@Body() chenageEmailDto:ChenageEmailDto,@Res() res:Response){
     const {code,message,token}=await this.userService.chenageEmail(chenageEmailDto.email)
     if(message) return res.json({message})
@@ -69,7 +72,13 @@ export class UserController {
   }
 
   @Post('verify-email')
+  @ApiConsumes(SwaggerConsumes.UrlEncoded,SwaggerConsumes.Json)
   verifayEmail(@Body() otpEmail:ChekOtpDto){
     return this.userService.verifyEmail(otpEmail.code)
+  }
+  @Patch('cheng-username')
+  @ApiConsumes(SwaggerConsumes.UrlEncoded,SwaggerConsumes.Json)
+  chengUsername(@Body() otpUsername:ChenageUsernameDto){
+    return this.userService.chenagUsername(otpUsername.username)
   }
 }
