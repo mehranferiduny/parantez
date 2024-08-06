@@ -1,7 +1,8 @@
 import { BassEntity } from "src/common/abestracs/bass.entity";
 import { EntityName } from "src/common/enums/entity.enum";
-import { Column, CreateDateColumn, Entity, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, UpdateDateColumn } from "typeorm";
 import { BlogStatus } from "../enums/status.enum";
+import { UserEntity } from "src/modules/user/entites/user.entity";
 
 @Entity(EntityName.Blog)
 export class BlogEntity extends BassEntity{
@@ -16,7 +17,9 @@ export class BlogEntity extends BassEntity{
   @Column({default:BlogStatus.Draft})
   status:string;
   @Column()
-  auterId:number;
+  authorId:number;
+  @ManyToOne(()=>UserEntity,user=>user.blogs,{onDelete:"CASCADE"})
+  user:UserEntity;
   @CreateDateColumn()
   created_at:Date
   @UpdateDateColumn()
