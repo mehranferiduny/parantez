@@ -10,10 +10,10 @@ export class BlogBookmarkEntity{
   @Column()
   blogId:number
    
-  @ManyToOne(()=>UserEntity,user=>user.bookmark,{onDelete:"CASCADE"})
-  user:UserEntity;
-  @ManyToOne(()=>BlogEntity,blog=>blog.bookmark,{onDelete:"CASCADE"})
-  blog:BlogEntity;
+  // @ManyToOne(()=>UserEntity,user=>user.bookmark,{onDelete:"CASCADE"})
+  // user:UserEntity;
+  // @ManyToOne(()=>BlogEntity,blog=>blog.bookmark,{onDelete:"CASCADE"})
+  // blog:BlogEntity;
 
 
   @CreateDateColumn()

@@ -7,6 +7,7 @@ import { UserModule } from '../user/user.module';
 import { AuthModule } from '../auth/auth.module';
 import { CategoryModule } from '../category/category.module';
 import { LoggerMiddleware } from 'src/common/logger/logger';
+import { BlogModule } from '../blog/blog.module';
 
 
 
@@ -19,7 +20,8 @@ import { LoggerMiddleware } from 'src/common/logger/logger';
     TypeOrmModule.forRoot(typeOrmConfig()),
     AuthModule,
     UserModule,
-    CategoryModule
+    CategoryModule,
+    BlogModule
   ],
     
   controllers: [],

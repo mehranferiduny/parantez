@@ -11,6 +11,12 @@ import { CommentBlogEntity } from "./comment.entity";
 export class BlogEntity extends BassEntity{
   @Column()
   title:string;
+  @Column({unique:true})
+  slug:string;
+  
+  @Column()
+  time_for_stady:string;
+  
   @Column()
   description:string;
   @Column()
@@ -24,14 +30,16 @@ export class BlogEntity extends BassEntity{
   @ManyToOne(()=>UserEntity,user=>user.blogs,{onDelete:"CASCADE"})
   user:UserEntity;
 
-  @OneToMany(()=>BlogLikeEntity,like=>like.blog,{onDelete:"CASCADE"})
-  like:BlogLikeEntity;
+  @OneToMany(()=>BlogLikeEntity,like=>like.blog)
+  likes:BlogLikeEntity[];
 
-  @OneToMany(()=>BlogBookmarkEntity,bookmark=>bookmark.user,{nullable:true})
-  bookmark:BlogBookmarkEntity[];
 
-  @OneToMany(()=>CommentBlogEntity,comment=>comment.blog,{nullable:true})
-  comment:CommentBlogEntity[];
+
+  // @OneToMany(()=>BlogBookmarkEntity,bookmark=>bookmark.user,{nullable:true})
+  // bookmark:BlogBookmarkEntity[];
+
+  // @OneToMany(()=>CommentBlogEntity,comment=>comment.blog,{nullable:true})
+  // comment:CommentBlogEntity[];
 
   @CreateDateColumn()
   created_at:Date
