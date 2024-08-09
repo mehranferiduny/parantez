@@ -4,6 +4,8 @@ import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, Upda
 import { OtpEntity } from "./otp.entity";
 import { ProfileEntity } from "./profile.entity";
 import { BlogEntity } from "src/modules/blog/entities/blog.entity";
+import { BlogLikeEntity } from "src/modules/blog/entities/like.entity";
+import { BlogBookmarkEntity } from "src/modules/blog/entities/bookmark.entity";
 
 @Entity(EntityName.User)
 export class UserEntity extends BassEntity{
@@ -38,6 +40,12 @@ export class UserEntity extends BassEntity{
 
    @OneToMany(()=>BlogEntity,blog=>blog.user,{nullable:true})
    blogs:BlogEntity[];
+
+   @OneToMany(()=>BlogLikeEntity,like=>like.user,{nullable:true})
+   like:BlogLikeEntity[];
+
+   @OneToMany(()=>BlogBookmarkEntity,bookmark=>bookmark.user,{nullable:true})
+   bookmark:BlogBookmarkEntity[];
 
   @CreateDateColumn()
   created_at:Date

@@ -1,8 +1,10 @@
 import { BassEntity } from "src/common/abestracs/bass.entity";
 import { EntityName } from "src/common/enums/entity.enum";
-import { Column, CreateDateColumn, Entity, ManyToOne, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, UpdateDateColumn } from "typeorm";
 import { BlogStatus } from "../enums/status.enum";
 import { UserEntity } from "src/modules/user/entites/user.entity";
+import { BlogLikeEntity } from "./like.entity";
+import { BlogBookmarkEntity } from "./bookmark.entity";
 
 @Entity(EntityName.Blog)
 export class BlogEntity extends BassEntity{
@@ -20,6 +22,13 @@ export class BlogEntity extends BassEntity{
   authorId:number;
   @ManyToOne(()=>UserEntity,user=>user.blogs,{onDelete:"CASCADE"})
   user:UserEntity;
+
+  @OneToMany(()=>BlogLikeEntity,like=>like.blog,{onDelete:"CASCADE"})
+  like:BlogLikeEntity;
+
+  @OneToMany(()=>BlogBookmarkEntity,bookmark=>bookmark.user,{nullable:true})
+  bookmark:BlogBookmarkEntity[];
+
   @CreateDateColumn()
   created_at:Date
   @UpdateDateColumn()
