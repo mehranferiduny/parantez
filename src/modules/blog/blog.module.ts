@@ -4,9 +4,12 @@ import { BlogController } from './blog.controller';
 import { AuthModule } from '../auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BlogEntity } from './entities/blog.entity';
+import { BlogLikeEntity } from './entities/like.entity';
+import { BlogBookmarkEntity } from './entities/bookmark.entity';
+import { CommentBlogEntity } from './entities/comment.entity';
 
 @Module({
-  imports:[AuthModule,TypeOrmModule.forFeature([BlogEntity])],
+  imports:[AuthModule,TypeOrmModule.forFeature([BlogEntity,BlogLikeEntity,BlogBookmarkEntity,CommentBlogEntity])],
   controllers: [BlogController],
   providers: [BlogService],
 })

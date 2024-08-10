@@ -18,11 +18,11 @@ export class CommentBlogEntity extends BassEntity{
   @Column()
   parentId:number;
 
-  // @ManyToOne(()=>UserEntity,user=>user.comment,{onDelete:"CASCADE"})
-  // user:UserEntity;
+  @ManyToOne(()=>UserEntity,user=>user.comment,{onDelete:"CASCADE"})
+  user:UserEntity;
 
-  // @ManyToOne(()=>BlogEntity,blog=>blog.comment,{onDelete:"CASCADE"})
-  // blog:BlogEntity;
+  @ManyToOne(()=>BlogEntity,blog=>blog.comment,{onDelete:"CASCADE"})
+  blog:BlogEntity;
 
   @ManyToOne(()=>CommentBlogEntity,comment=>comment.chiled,{onDelete:"CASCADE"})
   parent:CommentBlogEntity;

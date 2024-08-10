@@ -46,11 +46,11 @@ export class UserEntity extends BassEntity{
    blog_like:BlogLikeEntity[];
 
 
-  //  @OneToMany(()=>BlogBookmarkEntity,bookmark=>bookmark.user,{nullable:true})
-  //  bookmark:BlogBookmarkEntity[];
+   @OneToMany(()=>BlogBookmarkEntity,bookmark=>bookmark.user,{nullable:true})
+   bookmark:BlogBookmarkEntity[];
 
-  //  @OneToMany(()=>CommentBlogEntity,comment=>comment.user,{nullable:true})
-  //  comment:CommentBlogEntity[];
+   @OneToMany(()=>CommentBlogEntity,comment=>comment.user,{nullable:true})
+   comment:CommentBlogEntity[];
 
   @CreateDateColumn()
   created_at:Date
