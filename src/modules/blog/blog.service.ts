@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BlogEntity } from './entities/blog.entity';
 import { Repository } from 'typeorm';
 import { CreateBlogDto } from './dto/blog.dto';
-import { createSlug } from 'src/common/utils/functions.util';
+import { createSlug, RandumId } from 'src/common/utils/functions.util';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { BlogStatus } from './enums/status.enum';
@@ -24,6 +24,11 @@ export class BlogService {
     let slugData=slug ?? title;
     slug=createSlug(slugData)
 
+    const ExistSlug=await this.checkSlugUnic(slug)
+    if(ExistSlug){
+      slug=slug+`-${RandumId()}`
+    }
+
     const Blog=this.blogRepository.create({
       title,
       description,
@@ -39,5 +44,10 @@ export class BlogService {
     return {
       message:PublicMassege.Creaeted
     }
+  }
+
+  async checkSlugUnic(slug:string){
+    const Blog=await this.blogRepository.findOneBy({slug})
+    return !! Blog
   }
 }
