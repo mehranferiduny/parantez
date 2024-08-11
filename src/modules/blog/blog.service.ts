@@ -20,13 +20,12 @@ export class BlogService {
     const user=this.req.user
   
     let{slug,title,content,description,image,time_for_stady}=blogDto
-    console.log(blogDto.image)
     let slugData=slug ?? title;
     slug=createSlug(slugData)
 
     const ExistSlug=await this.checkSlugUnic(slug)
     if(ExistSlug){
-      slug=slug+`-${RandumId()}`
+      slug+=`-${RandumId()}`
     }
 
     const Blog=this.blogRepository.create({
@@ -49,5 +48,17 @@ export class BlogService {
   async checkSlugUnic(slug:string){
     const Blog=await this.blogRepository.findOneBy({slug})
     return !! Blog
+  }
+
+  async myBlog(){
+    const {id}=this.req.user
+    return this.blogRepository.find({
+      where:{
+        authorId:id
+      },
+      order:{
+        id:"DESC"
+      }
+    })
   }
 }
