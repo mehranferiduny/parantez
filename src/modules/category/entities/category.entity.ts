@@ -1,6 +1,7 @@
 import { BassEntity } from "src/common/abestracs/bass.entity";
 import { EntityName } from "src/common/enums/entity.enum";
-import { Column, Entity } from "typeorm";
+import { BlogCtaegoryEntity } from "src/modules/blog/entities/bolg-category.entity";
+import { Column, Entity, OneToMany } from "typeorm";
 
 @Entity(EntityName.Category)
 export class CategoryEntity extends BassEntity{
@@ -8,4 +9,7 @@ export class CategoryEntity extends BassEntity{
   title:string;
   @Column({nullable:true})
   priority:number
+
+  @OneToMany(()=>BlogCtaegoryEntity,blog=>blog.category_blog)
+  bolg_category:BlogCtaegoryEntity[]
 }
