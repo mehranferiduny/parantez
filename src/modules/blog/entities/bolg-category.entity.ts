@@ -7,13 +7,11 @@ import { CategoryEntity } from "src/modules/category/entities/category.entity";
 @Entity(EntityName.BlogCategory)
 export class BlogCtaegoryEntity extends BassEntity{
   @Column()
-  blogId:number;
-  @Column()
-  catgoryId:number;
-
-  @ManyToOne(()=>BlogEntity,blog=>blog.category,{onDelete:"CASCADE"})
-  blog:BlogEntity;
-
-  @ManyToOne(()=>CategoryEntity,cat=>cat.bolg_category,{onDelete:"CASCADE"})
-  category_blog:CategoryEntity;
+    blogId: number;
+    @Column({nullable:false})
+    categoryId: number;
+    @ManyToOne(() => BlogEntity, blog => blog.categoris, {onDelete: "CASCADE"})
+    blog: BlogEntity
+    @ManyToOne(() => CategoryEntity, category => category.blog_categories, {onDelete: "CASCADE"})
+    category: CategoryEntity
 }

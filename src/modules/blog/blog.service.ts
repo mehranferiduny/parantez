@@ -1,13 +1,13 @@
-import { Inject, Injectable, Scope } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Scope } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BlogEntity } from './entities/blog.entity';
-import { Repository } from 'typeorm';
-import { CreateBlogDto } from './dto/blog.dto';
+import { FindOptionsWhere, Repository } from 'typeorm';
+import { CreateBlogDto, FilterBlogDto } from './dto/blog.dto';
 import { createSlug, RandumId } from 'src/common/utils/functions.util';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { BlogStatus } from './enums/status.enum';
-import { PublicMassege } from 'src/common/enums/message.enum';
+import { BadRequestExceptionMasseage, PublicMassege } from 'src/common/enums/message.enum';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { PagitionGeneritor, PagitionSolver } from 'src/common/utils/pagintion.util';
 import { CategoryService } from '../category/category.service';
@@ -29,11 +29,11 @@ export class BlogService {
     let{slug,title,content,description,image,time_for_stady,categoris}=blogDto
     let slugData=slug ?? title;
     slug=createSlug(slugData)
-    console.log(categoris)
+  
     if(!isArray(categoris) && typeof categoris == "string" ){
       categoris=categoris.split(",")
-    }else{
-      categoris=[]
+    }else if(!isArray(categoris)){
+      throw new BadRequestException(BadRequestExceptionMasseage.InValidCategoryData)
     }
 
    
@@ -67,7 +67,7 @@ export class BlogService {
 
         await this.blogCategoryRepository.insert({
           blogId:Blog.id,
-          catgoryId:category.id
+          categoryId:category.id
         })
 
     }
@@ -93,13 +93,42 @@ export class BlogService {
       }
     })
   }
-  async blogList(pagintinDto:PaginationDto){
+  async blogList(pagintinDto:PaginationDto,filterDto:FilterBlogDto){
     const {limit,page,skip}=PagitionSolver(pagintinDto)
+    const {category}=filterDto
+
+
+
+    let where:FindOptionsWhere<BlogEntity>={}
+
+    if(category){
+     where['category']={
+      category:{
+        title:category
+      }
+     }
+    }
+
+ 
    
     const[blogs,count]=await this.blogRepository.findAndCount({
-      where:{
-    
+      relations:{
+       categoris:{
+        category:true
+       }
       },
+      where:{},
+      select:{
+        categoris:{
+          id:true,
+          
+          category:
+          {
+       
+            title:true
+          }
+
+      }},
       order:{
         id:"DESC"
       },

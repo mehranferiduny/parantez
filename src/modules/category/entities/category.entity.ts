@@ -5,12 +5,12 @@ import { Column, Entity, OneToMany } from "typeorm";
 
 @Entity(EntityName.Category)
 export class CategoryEntity extends BassEntity{
-  @Column()
-  title:string;
-  @Column({nullable:true})
-  //!اولویت بندی با این مقدار
-  priority:number
 
-  @OneToMany(()=>BlogCtaegoryEntity,blog=>blog.category_blog)
-  bolg_category:BlogCtaegoryEntity[]
+  @Column()
+  title: string;
+  @Column({nullable: true})
+    //!اولویت بندی با این مقدار
+  priority: number
+  @OneToMany(() => BlogCtaegoryEntity, blog => blog.category)
+  blog_categories: BlogCtaegoryEntity[];
 }

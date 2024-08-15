@@ -39,3 +39,8 @@ export class CreateBlogDto {
   @IsString()
   categoris:string[] | string
 }
+
+export class FilterBlogDto{
+  @ApiPropertyOptional({type:String})
+  category:string
+}

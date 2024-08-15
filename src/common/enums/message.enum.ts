@@ -1,6 +1,7 @@
 export enum BadRequestExceptionMasseage{
   InValidLoginData="اطلاعات جهت ورود نادرست میباشد",
   InValidRegisterData="اطلاعات جهت ثبت نام نادرست میباشد",
+  InValidCategoryData="اطلاعات دسته بندی را به درستی وارد نمایید",
   InValidExpierCode="کد ارسال شده هنور معتبر میباشد",
   BatTryAgen="مشکلی به وجود آمئه است مجددا تلاش نمایید"
 }
