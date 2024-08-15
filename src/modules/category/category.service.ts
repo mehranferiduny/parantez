@@ -25,6 +25,12 @@ export class CategoryService {
     message:PublicMassege.Creaeted
    }
   }
+ 
+
+  async InsertByTitle(title:string){
+    const category= this.categoryRepository.create({title})
+     return await this.categoryRepository.save(category)
+  }
 
   async checkResaltByTitle(title:string){
     title=title?.trim()?.toLowerCase();
@@ -54,6 +60,13 @@ export class CategoryService {
     return category
 
   }
+
+  async findOneByTitle(title: string) {
+    return await this.categoryRepository.findOneBy({title})
+   
+ 
+   }
+ 
 
   async update(id: number, updateCategoryDto: UpdateCategoryDto) {
     const category= await this.findOne(id)

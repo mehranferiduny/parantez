@@ -10,27 +10,44 @@ import { BlogStatus } from './enums/status.enum';
 import { PublicMassege } from 'src/common/enums/message.enum';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { PagitionGeneritor, PagitionSolver } from 'src/common/utils/pagintion.util';
+import { CategoryService } from '../category/category.service';
+import { isArray, IsArray } from 'class-validator';
+import { BlogCtaegoryEntity } from './entities/bolg-category.entity';
 
 @Injectable({scope:Scope.REQUEST})
 export class BlogService {
   constructor(
     @InjectRepository(BlogEntity) private readonly blogRepository:Repository<BlogEntity>,
-    @Inject(REQUEST) private readonly req:Request
+    @InjectRepository(BlogCtaegoryEntity) private readonly blogCategoryRepository:Repository<BlogCtaegoryEntity>,
+    @Inject(REQUEST) private readonly req:Request,
+    private readonly categoryServis:CategoryService
   ){}
 
  async create(blogDto:CreateBlogDto){
-    const user=this.req.user
+   
   
-    let{slug,title,content,description,image,time_for_stady}=blogDto
+    let{slug,title,content,description,image,time_for_stady,categoris}=blogDto
     let slugData=slug ?? title;
     slug=createSlug(slugData)
+    console.log(categoris)
+    if(!isArray(categoris) && typeof categoris == "string" ){
+      categoris=categoris.split(",")
+    }else{
+      categoris=[]
+    }
 
+   
+      
+
+      
+    const user=this.req.user
+   
     const ExistSlug=await this.checkSlugUnic(slug)
     if(ExistSlug){
       slug+=`-${RandumId()}`
     }
 
-    const Blog=this.blogRepository.create({
+    let Blog=this.blogRepository.create({
       title,
       description,
       slug,
@@ -40,7 +57,20 @@ export class BlogService {
       authorId:user.id,
       status:BlogStatus.Draft
     })
-    await this.blogRepository.save(Blog)
+    Blog=await this.blogRepository.save(Blog)
+
+    for (const categoryTitle of categoris) {
+        let category =await this.categoryServis.findOneByTitle(categoryTitle);
+        if(!category){
+          category= await this.categoryServis.InsertByTitle(categoryTitle)
+        }
+
+        await this.blogCategoryRepository.insert({
+          blogId:Blog.id,
+          catgoryId:category.id
+        })
+
+    }
 
     return {
       message:PublicMassege.Creaeted
