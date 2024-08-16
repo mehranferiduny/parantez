@@ -3,6 +3,7 @@ import { ApiQuery } from "@nestjs/swagger";
 
 export function Filter(){
   return applyDecorators(
-    ApiQuery({name:"category",example:1,required:false}),
+    ApiQuery({name:"category",required:false}),
+    ApiQuery({name:"search",required:false}),
   )
 }

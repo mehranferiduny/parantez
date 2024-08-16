@@ -13,6 +13,7 @@ import { PagitionGeneritor, PagitionSolver } from 'src/common/utils/pagintion.ut
 import { CategoryService } from '../category/category.service';
 import { isArray, IsArray } from 'class-validator';
 import { BlogCtaegoryEntity } from './entities/bolg-category.entity';
+import { EntityName } from 'src/common/enums/entity.enum';
 
 @Injectable({scope:Scope.REQUEST})
 export class BlogService {
@@ -95,47 +96,72 @@ export class BlogService {
   }
   async blogList(pagintinDto:PaginationDto,filterDto:FilterBlogDto){
     const {limit,page,skip}=PagitionSolver(pagintinDto)
-    const {category}=filterDto
+    let {category,search}=filterDto
 
 
 
-    let where:FindOptionsWhere<BlogEntity>={}
-
+    // let where:FindOptionsWhere<BlogEntity>={}
+    let where=''
+   
     if(category){
-     where['category']={
-      category:{
-        title:category
-      }
-     }
+    //  where['category']={
+    //   category:{
+    //     title:category
+    //   }
+    //  } 
+        
+         category=category.toLowerCase();
+         if(where.length > 0 ) where += ' AND '
+         where += 'category.title = LOWER(:category)'
+        console.log(where)
     }
+    if(search){
+     if(where.length > 0 ) where+= ' AND '
+
+     search= `%${search}%`
+     where+='CONCAT(blog.title , blog.content , blog.description) ILIKE :search'
+
+
+    }
+
+    const [blogs,count]=await this.blogRepository.createQueryBuilder(EntityName.Blog)
+    .leftJoin("blog.categoris","categoris")
+    .leftJoin("categoris.category","category")
+    .addSelect(['categoris.id','category.title'])
+    .where(where,{category,search})
+    .orderBy("blog.id","DESC")
+    .take(limit)
+    .skip(skip)
+    .getManyAndCount()
+
 
  
    
-    const[blogs,count]=await this.blogRepository.findAndCount({
-      relations:{
-       categoris:{
-        category:true
-       }
-      },
-      where:{},
-      select:{
-        categoris:{
-          id:true,
+    // const[blogs,count]=await this.blogRepository.findAndCount({
+    //   relations:{
+    //    categoris:{
+    //     category:true
+    //    }
+    //   },
+    //   where:{},
+    //   select:{
+    //     categoris:{
+    //       id:true,
           
-          category:
-          {
+    //       category:
+    //       {
        
-            title:true
-          }
+    //         title:true
+    //       }
 
-      }},
-      order:{
-        id:"DESC"
-      },
-      skip,
-      take:limit
+    //   }},
+    //   order:{
+    //     id:"DESC"
+    //   },
+    //   skip,
+    //   take:limit
 
-    })
+    // })
     return{
       pagination:PagitionGeneritor(page,limit,count),
       blogs
