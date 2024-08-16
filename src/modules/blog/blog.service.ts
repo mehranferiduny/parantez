@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, Scope } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException, Scope } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BlogEntity } from './entities/blog.entity';
 import { FindOptionsWhere, Repository } from 'typeorm';
@@ -7,7 +7,7 @@ import { createSlug, RandumId } from 'src/common/utils/functions.util';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { BlogStatus } from './enums/status.enum';
-import { BadRequestExceptionMasseage, PublicMassege } from 'src/common/enums/message.enum';
+import { BadRequestExceptionMasseage, NotFindMassege, PublicMassege } from 'src/common/enums/message.enum';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { PagitionGeneritor, PagitionSolver } from 'src/common/utils/pagintion.util';
 import { CategoryService } from '../category/category.service';
@@ -166,5 +166,19 @@ export class BlogService {
       pagination:PagitionGeneritor(page,limit,count),
       blogs
     }
+  }
+
+  async delete(id:number){
+    await this.checkExistBlogById(id)
+    await this.blogRepository.delete({id})
+    return {
+      message:PublicMassege.Deleted
+    }
+  }
+
+  async checkExistBlogById(id:number){
+    const blog =await this.blogRepository.findOneBy({id})
+    if(!blog) throw new NotFoundException(NotFindMassege.NotPost)
+    return blog
   }
 }
