@@ -80,7 +80,7 @@ export class BlogService {
 
   async checkSlugUnic(slug:string){
     const Blog=await this.blogRepository.findOneBy({slug})
-    return !! Blog
+    return  Blog
   }
 
   async myBlog(){
@@ -192,7 +192,47 @@ export class BlogService {
     }else if(!isArray(categoris)){
       throw new BadRequestException(BadRequestExceptionMasseage.InValidCategoryData)
     }
+     let slugData=null
+    if(title){
+      blog.title=title
+      slugData=title
+    }
+    if(slug){
+      slugData=slug
+    }
+    if(slugData){
+      slug=createSlug(slugData)
+      const ExistSlug=await this.checkSlugUnic(slug)
+      if(ExistSlug && ExistSlug.id !== id){
+        slug+=`-${RandumId()}`
+      }
+
+      blog.slug=slug
+    }
+    if(description) blog.description=description;
+    if(content) blog.content=content
+    if(image) blog.image=image
+    if(time_for_stady) blog.time_for_stady=time_for_stady
+    await this.blogRepository.save(blog)
+    await this.blogCategoryRepository.delete({blogId:blog.id})
+    for (const categoryTitle of categoris) {
+      let category =await this.categoryServis.findOneByTitle(categoryTitle);
+      if(!category){
+        category= await this.categoryServis.InsertByTitle(categoryTitle)
+      }
+      
+          await this.blogCategoryRepository.insert({
+            blogId:blog.id,
+            categoryId:category.id
+          })
         
+     
+
+  }
+
+  return {
+    message:PublicMassege.Updaeted
+  }
 
   }
 }
