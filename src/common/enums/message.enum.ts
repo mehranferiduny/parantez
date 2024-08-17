@@ -18,6 +18,8 @@ export enum PublicMassege{
   Creaeted="با موفقیت ایجاد شد",
   Updaeted="با موفقیت ویرایش شد",
   Deleted="با موفقیت حذف شد",
+  Like="مقاله لایک شد",
+  Dislike="لایک مقاله برداشته شد"
 
 }
 

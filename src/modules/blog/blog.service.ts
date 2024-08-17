@@ -14,12 +14,14 @@ import { CategoryService } from '../category/category.service';
 import { isArray, IsArray } from 'class-validator';
 import { BlogCtaegoryEntity } from './entities/bolg-category.entity';
 import { EntityName } from 'src/common/enums/entity.enum';
+import { BlogLikeEntity } from './entities/like.entity';
 
 @Injectable({scope:Scope.REQUEST})
 export class BlogService {
   constructor(
     @InjectRepository(BlogEntity) private readonly blogRepository:Repository<BlogEntity>,
     @InjectRepository(BlogCtaegoryEntity) private readonly blogCategoryRepository:Repository<BlogCtaegoryEntity>,
+    @InjectRepository(BlogLikeEntity) private readonly blogLikeRepository:Repository<BlogLikeEntity>,
     @Inject(REQUEST) private readonly req:Request,
     private readonly categoryServis:CategoryService
   ){}
@@ -234,5 +236,21 @@ export class BlogService {
     message:PublicMassege.Updaeted
   }
 
+  }
+
+
+  async likeTaiggel(blogId:number){
+    const {id:userId}=this.req.user
+    await this.checkExistBlogById(blogId);
+    const isLiked=await this.blogLikeRepository.findOneBy({userId,blogId})
+   
+    let massege=PublicMassege.Like
+    if(isLiked){
+      await this.blogLikeRepository.delete({id:isLiked.id})
+      massege=PublicMassege.Dislike
+    } else{
+      await this.blogLikeRepository.insert({blogId,userId})
+    }
+      return {massege}
   }
 }

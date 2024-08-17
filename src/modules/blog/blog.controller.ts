@@ -46,5 +46,10 @@ export class BlogController {
     return this.blogService.update(id,blogDto)
   }
 
+  @Get("like/:id")
+  likeTaiggel(@Param("id",ParseIntPipe)id:number){
+    return this.blogService.likeTaiggel(id)
+  }
+
 
 }
