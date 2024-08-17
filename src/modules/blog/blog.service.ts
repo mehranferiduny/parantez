@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable, NotFoundException, Scope } fro
 import { InjectRepository } from '@nestjs/typeorm';
 import { BlogEntity } from './entities/blog.entity';
 import { FindOptionsWhere, Repository } from 'typeorm';
-import { CreateBlogDto, FilterBlogDto } from './dto/blog.dto';
+import { CreateBlogDto, FilterBlogDto, UpdeatBlogDto } from './dto/blog.dto';
 import { createSlug, RandumId } from 'src/common/utils/functions.util';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
@@ -180,5 +180,19 @@ export class BlogService {
     const blog =await this.blogRepository.findOneBy({id})
     if(!blog) throw new NotFoundException(NotFindMassege.NotPost)
     return blog
+  }
+
+
+  async update(id:number,blogDto:UpdeatBlogDto){
+    const user=this.req.user
+    let{slug,title,content,description,image,time_for_stady,categoris}=blogDto
+    const blog=await this.checkExistBlogById(id)
+    if(!isArray(categoris) && typeof categoris == "string" ){
+      categoris=categoris.split(",")
+    }else if(!isArray(categoris)){
+      throw new BadRequestException(BadRequestExceptionMasseage.InValidCategoryData)
+    }
+        
+
   }
 }
