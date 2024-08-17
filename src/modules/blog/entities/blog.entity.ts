@@ -29,7 +29,7 @@ export class BlogEntity extends BassEntity{
   @Column()
   authorId:number;
   @ManyToOne(()=>UserEntity,user=>user.blogs,{onDelete:"CASCADE"})
-  user:UserEntity;
+  author:UserEntity;
 
   @OneToMany(()=>BlogLikeEntity,like=>like.blog)
   likes:BlogLikeEntity[];

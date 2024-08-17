@@ -39,7 +39,7 @@ export class UserEntity extends BassEntity{
    @JoinColumn({name:"profileId"})
    profile:ProfileEntity
 
-   @OneToMany(()=>BlogEntity,blog=>blog.user,{nullable:true})
+   @OneToMany(()=>BlogEntity,blog=>blog.author,{nullable:true})
    blogs:BlogEntity[];
 
    @OneToMany(()=>BlogLikeEntity,like=>like.user)
