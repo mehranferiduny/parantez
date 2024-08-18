@@ -315,4 +315,33 @@ export class BlogService {
     }
     return { massege };
   }
+
+
+  async findOneBySlug(slug:string){
+    const userId=this.req?.user?.id;
+    const blog= await this.blogRepository
+    .createQueryBuilder(EntityName.Blog)
+    .leftJoin("blog.categoris", "categoris")
+    .leftJoin("categoris.category", "category")
+    .leftJoin("blog.author", "auther")
+    .leftJoin("auther.profile", "profile")
+    .addSelect([
+      "categoris.id",
+      "category.title",
+      "auther.username",
+      "auther.id",
+      "profile.nik_name",
+    ])
+    .where({ slug })
+    .loadRelationCountAndMap("blog.likes", "blog.likes")
+    .loadRelationCountAndMap("blog.bookmark", "blog.bookmark")
+    .leftJoinAndSelect("blog.comment", "comment","comment.acseped = :acseped",{acseped:true})
+    .getOne();
+
+    if(!blog) throw new NotFoundException(NotFindMassege.NotPost)
+    const isLiked=!!(await this.blogLikeRepository.findOneBy({userId,blogId:blog.id})) 
+    const isBookmarked=!!(await this.blogBookmarkRepository.findOneBy({userId,blogId:blog.id})) 
+    const blogData={isLiked,isBookmarked,...blog};
+    return blogData
+  }
 }

@@ -39,6 +39,11 @@ export class BlogController {
     return this.blogService.myBlog();
   }
 
+  @Get("/slug-find/:slug")
+  findOneBySlug(@Param("slug") slug:string) {
+    return this.blogService.findOneBySlug(slug);
+  }
+
   @Get()
   @skipAuth()
   @Pagination()
