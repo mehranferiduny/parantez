@@ -15,7 +15,7 @@ export class CommentBlogEntity extends BassEntity{
   blogId:number;
   @Column()
   userId:number;
-  @Column()
+  @Column({nullable:true})
   parentId:number;
 
   @ManyToOne(()=>UserEntity,user=>user.comment,{onDelete:"CASCADE"})

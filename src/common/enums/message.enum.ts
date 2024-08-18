@@ -21,7 +21,8 @@ export enum PublicMassege{
   Like="مقاله لایک شد",
   Dislike="لایک مقاله برداشته شد",
   Bookmark="مقاله ذخیره شد",
-  UnBookmark="مقاله از ذخیره شده ها خارج شد"
+  UnBookmark="مقاله از ذخیره شده ها خارج شد",
+  CommentBlog="دیدگا با موفقیت ایجاد شد"
 
 }
 
