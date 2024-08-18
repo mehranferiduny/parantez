@@ -15,6 +15,7 @@ import { Repository } from "typeorm";
 import { BlogService } from "./blog.service";
 import { CreateCommentDto } from "../dto/comment.dto";
 import { PublicMassege } from "src/common/enums/message.enum";
+import { ReportText } from "src/common/utils/functions.util";
 
 @Injectable({ scope: Scope.REQUEST })
 export class BlogCommentService {
@@ -31,6 +32,10 @@ export class BlogCommentService {
      const {blogId,parentId,text}=commentDto
      const {id:userId}=this.req.user
      await this.blogServis.checkExistBlogById(blogId)
+     const isAcsep=ReportText(text)
+      if(isAcsep){
+        return {message:PublicMassege.RiportComment}
+      }
      let parent=null
      if(parentId && !isNaN(parentId)){
       parent =await this.blogCommentRepository.findOneBy({id:+parentId})
