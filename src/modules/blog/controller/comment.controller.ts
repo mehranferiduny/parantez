@@ -2,7 +2,11 @@ import {
   Body,
   Controller,
 
+  Get,
+
   Post,
+
+  Query,
 
   UseGuards,
 } from "@nestjs/common";
@@ -14,6 +18,8 @@ import { AuthGuard } from "../../auth/guards/auth.guard";
 
 import { CreateCommentDto } from "../dto/comment.dto";
 import { BlogCommentService } from "../service/comment.service";
+import { PaginationDto } from "src/common/dtos/pagination.dto";
+import { Pagination } from "src/common/decorators/paginashen.decorator";
 
 @Controller("blog-comment")
 @ApiTags("Blog")
@@ -27,4 +33,10 @@ export class BlogCommentController {
   createComment(@Body() commentDto: CreateCommentDto) {
     return this.blogCommentService.create(commentDto);
   }
+
+  @Get()
+  @Pagination()
+  find(@Query() pagintinDto: PaginationDto) {
+    return this.blogCommentService.find(pagintinDto);
+}
 }
