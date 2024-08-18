@@ -40,8 +40,9 @@ export class BlogController {
   }
 
   @Get("/slug-find/:slug")
-  findOneBySlug(@Param("slug") slug:string) {
-    return this.blogService.findOneBySlug(slug);
+  @Pagination()
+  findOneBySlug(@Param("slug") slug:string,@Query() pagintinDto: PaginationDto) {
+    return this.blogService.findOneBySlug(pagintinDto,slug);
   }
 
   @Get()

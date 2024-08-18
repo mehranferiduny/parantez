@@ -1,6 +1,7 @@
 import {
 
   BadRequestException,
+  forwardRef,
   Inject,
   Injectable,
 
@@ -14,7 +15,7 @@ import { REQUEST } from "@nestjs/core";
 import { Request } from "express";
 
 import { CommentBlogEntity } from "../entities/comment.entity";
-import { Repository } from "typeorm";
+import { IsNull, Repository } from "typeorm";
 import { BlogService } from "./blog.service";
 import { CreateCommentDto } from "../dto/comment.dto";
 import { BadRequestExceptionMasseage, NotFindMassege, PublicMassege } from "src/common/enums/message.enum";
@@ -29,7 +30,7 @@ export class BlogCommentService {
     private readonly blogCommentRepository: Repository<CommentBlogEntity>,
 
     @Inject(REQUEST) private readonly req: Request,
-    private readonly blogServis: BlogService
+    @Inject(forwardRef(()=>BlogService))private readonly blogServis: BlogService
   ) {}
   
   //!Create Comment 
@@ -112,6 +113,66 @@ export class BlogCommentService {
     return{ 
       message:PublicMassege.Updaeted
 
+    }
+   }
+
+   async findCommentsOfBlog( pagintinDto: PaginationDto,blogId:number){
+    const {limit,page,skip}=PagitionSolver(pagintinDto)
+    const [comments,count]=await this.blogCommentRepository.findAndCount({
+      where:{
+        blogId,
+        parentId:IsNull()
+      },
+      relations:{
+
+        user:{profile:true},
+
+        chiled:{
+          user:{profile:true},
+          chiled:{
+            user:{profile:true},
+          }
+        }
+      },
+      select:{
+      
+        user:{
+          username:true,
+          profile:{
+            nik_name:true
+          },
+          
+        },
+        chiled:{
+          text:true,
+          created_at:true,
+          parentId:true,
+          user:{
+            username:true,
+            profile:{
+              nik_name:true
+            }
+          },
+          chiled:{
+            text:true,
+            created_at:true,
+            parentId:true,
+            user:{
+              username:true,
+              profile:{
+                nik_name:true
+              }
+            }
+          }
+
+        }
+      },
+      skip,
+      take:limit
+    })
+    return{
+      pagition:PagitionGeneritor(page,limit,count),
+      comments
     }
    }
 }
