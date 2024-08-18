@@ -19,7 +19,9 @@ export enum PublicMassege{
   Updaeted="با موفقیت ویرایش شد",
   Deleted="با موفقیت حذف شد",
   Like="مقاله لایک شد",
-  Dislike="لایک مقاله برداشته شد"
+  Dislike="لایک مقاله برداشته شد",
+  Bookmark="مقاله ذخیره شد",
+  UnBookmark="مقاله از ذخیره شده ها خارج شد"
 
 }
 

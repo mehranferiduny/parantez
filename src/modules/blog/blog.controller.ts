@@ -47,8 +47,12 @@ export class BlogController {
   }
 
   @Get("like/:id")
-  likeTaiggel(@Param("id",ParseIntPipe)id:number){
-    return this.blogService.likeTaiggel(id)
+  likeToggel(@Param("id",ParseIntPipe)id:number){
+    return this.blogService.likeToggel(id)
+  }
+  @Get("bookmark/:id")
+  bookmarkToggel(@Param("id",ParseIntPipe)id:number){
+    return this.blogService.bookmarkToggel(id)
   }
 
 

@@ -15,6 +15,7 @@ import { isArray, IsArray } from 'class-validator';
 import { BlogCtaegoryEntity } from './entities/bolg-category.entity';
 import { EntityName } from 'src/common/enums/entity.enum';
 import { BlogLikeEntity } from './entities/like.entity';
+import { BlogBookmarkEntity } from './entities/bookmark.entity';
 
 @Injectable({scope:Scope.REQUEST})
 export class BlogService {
@@ -22,10 +23,12 @@ export class BlogService {
     @InjectRepository(BlogEntity) private readonly blogRepository:Repository<BlogEntity>,
     @InjectRepository(BlogCtaegoryEntity) private readonly blogCategoryRepository:Repository<BlogCtaegoryEntity>,
     @InjectRepository(BlogLikeEntity) private readonly blogLikeRepository:Repository<BlogLikeEntity>,
+    @InjectRepository(BlogBookmarkEntity) private readonly blogBookmarkRepository:Repository<BlogBookmarkEntity>,
     @Inject(REQUEST) private readonly req:Request,
     private readonly categoryServis:CategoryService
   ){}
 
+  //!Create Blog
  async create(blogDto:CreateBlogDto){
    
   
@@ -80,11 +83,13 @@ export class BlogService {
     }
   }
 
+  //! Check Unic Slug
   async checkSlugUnic(slug:string){
     const Blog=await this.blogRepository.findOneBy({slug})
     return  Blog
   }
 
+  //!Get My Blog
   async myBlog(){
     const {id}=this.req.user
     return this.blogRepository.find({
@@ -96,6 +101,8 @@ export class BlogService {
       }
     })
   }
+
+  //!Get Blog List
   async blogList(pagintinDto:PaginationDto,filterDto:FilterBlogDto){
     const {limit,page,skip}=PagitionSolver(pagintinDto)
     let {category,search}=filterDto
@@ -134,6 +141,7 @@ export class BlogService {
     .addSelect(['categoris.id','category.title','auther.username','auther.id','profile.nik_name'])
     .where(where,{category,search})
     .loadRelationCountAndMap("blog.likes","blog.likes")
+    .loadRelationCountAndMap("blog.bookmark","blog.bookmark")
     .orderBy("blog.id","DESC")
     .take(limit)
     .skip(skip)
@@ -172,7 +180,8 @@ export class BlogService {
       blogs
     }
   }
-
+ 
+  //! Delete Blog
   async delete(id:number){
     await this.checkExistBlogById(id)
     await this.blogRepository.delete({id})
@@ -181,13 +190,14 @@ export class BlogService {
     }
   }
 
+  //! Check Exist Blog By Id
   async checkExistBlogById(id:number){
     const blog =await this.blogRepository.findOneBy({id})
     if(!blog) throw new NotFoundException(NotFindMassege.NotPost)
     return blog
   }
 
-
+ //!Update Blog
   async update(id:number,blogDto:UpdeatBlogDto){
     const user=this.req.user
     let{slug,title,content,description,image,time_for_stady,categoris}=blogDto
@@ -242,7 +252,24 @@ export class BlogService {
   }
 
 
-  async likeTaiggel(blogId:number){
+  //!Bookmark Blog
+  async bookmarkToggel(blogId:number){
+    const {id:userId}=this.req.user
+    await this.checkExistBlogById(blogId);
+    const isBookmark=await this.blogBookmarkRepository.findOneBy({userId,blogId})
+   
+    let massege=PublicMassege.Bookmark
+    if(isBookmark){
+      await this.blogBookmarkRepository.delete({id:isBookmark.id})
+      massege=PublicMassege.UnBookmark
+    } else{
+      await this.blogBookmarkRepository.insert({blogId,userId})
+    }
+      return {massege}
+  }
+
+  //!Like Blog
+  async likeToggel(blogId:number){
     const {id:userId}=this.req.user
     await this.checkExistBlogById(blogId);
     const isLiked=await this.blogLikeRepository.findOneBy({userId,blogId})
