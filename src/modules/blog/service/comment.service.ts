@@ -1,7 +1,10 @@
 import {
 
+  BadRequestException,
   Inject,
   Injectable,
+
+  NotFoundException,
 
   Scope,
 } from "@nestjs/common";
@@ -14,7 +17,7 @@ import { CommentBlogEntity } from "../entities/comment.entity";
 import { Repository } from "typeorm";
 import { BlogService } from "./blog.service";
 import { CreateCommentDto } from "../dto/comment.dto";
-import { PublicMassege } from "src/common/enums/message.enum";
+import { BadRequestExceptionMasseage, NotFindMassege, PublicMassege } from "src/common/enums/message.enum";
 import { ReportText } from "src/common/utils/functions.util";
 import { PaginationDto } from "src/common/dtos/pagination.dto";
 import { PagitionGeneritor, PagitionSolver } from "src/common/utils/pagintion.util";
@@ -81,6 +84,34 @@ export class BlogCommentService {
     return{
       pagition:PagitionGeneritor(page,limit,count),
       comments
+    }
+   }
+
+   async checkExistComentById(id:number){
+    const comment=await this.blogCommentRepository.findOneBy({id})
+    if(!comment) throw new NotFoundException(NotFindMassege.NotPost)
+      return comment
+   }
+   //! Acseped Comment
+   async acsepet(id:number){
+    const comment=await this.checkExistComentById(id)
+    if(comment.acseped) throw new BadRequestException(BadRequestExceptionMasseage.AllredyAcsepted)
+      comment.acseped=true;
+    await this.blogCommentRepository.save(comment)
+    return{ 
+      message:PublicMassege.Updaeted
+
+    }
+   }
+   //! Rejected Comment
+   async reject(id:number){
+    const comment=await this.checkExistComentById(id)
+    if(!comment.acseped) throw new BadRequestException(BadRequestExceptionMasseage.AllredyReject)
+      comment.acseped=false;
+    await this.blogCommentRepository.save(comment)
+    return{ 
+      message:PublicMassege.Updaeted
+
     }
    }
 }

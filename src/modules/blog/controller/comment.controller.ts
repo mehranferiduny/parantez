@@ -4,7 +4,13 @@ import {
 
   Get,
 
+  Param,
+
+  ParseIntPipe,
+
   Post,
+
+  Put,
 
   Query,
 
@@ -39,4 +45,14 @@ export class BlogCommentController {
   find(@Query() pagintinDto: PaginationDto) {
     return this.blogCommentService.find(pagintinDto);
 }
+
+  @Put("/acsept/:id")
+  acsept (@Param("id",ParseIntPipe) id:number){
+    return this.blogCommentService.acsepet(id)
+  }
+
+  @Put("/reject/:id")
+  reject(@Param("id",ParseIntPipe) id:number){
+    return this.blogCommentService.reject(id)
+  }
 }
