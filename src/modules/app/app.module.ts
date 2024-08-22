@@ -8,6 +8,7 @@ import { AuthModule } from '../auth/auth.module';
 import { CategoryModule } from '../category/category.module';
 import { LoggerMiddleware } from 'src/common/logger/logger';
 import { BlogModule } from '../blog/blog.module';
+import { ImagesModule } from '../images/images.module';
 
 
 
@@ -21,7 +22,8 @@ import { BlogModule } from '../blog/blog.module';
     AuthModule,
     UserModule,
     CategoryModule,
-    BlogModule
+    BlogModule,
+    ImagesModule
   ],
     
   controllers: [],
