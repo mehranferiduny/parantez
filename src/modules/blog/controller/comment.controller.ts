@@ -26,11 +26,10 @@ import { CreateCommentDto } from "../dto/comment.dto";
 import { BlogCommentService } from "../service/comment.service";
 import { PaginationDto } from "src/common/dtos/pagination.dto";
 import { Pagination } from "src/common/decorators/paginashen.decorator";
+import { AuthDecorator } from "src/common/decorators/auth.decorator";
 
 @Controller("blog-comment")
-@ApiTags("Blog")
-@ApiBearerAuth("Authuriztion")
-@UseGuards(AuthGuard)
+@AuthDecorator("Comment")
 export class BlogCommentController {
   constructor(private readonly blogCommentService: BlogCommentService) {}
 

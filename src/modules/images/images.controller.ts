@@ -3,15 +3,16 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
 } from "@nestjs/common";
 import { ImagesService } from "./images.service";
 import { ImageDto } from "./dto/image.dto";
+import { AuthDecorator } from "src/common/decorators/auth.decorator";
 
 
 @Controller("images")
+@AuthDecorator("Image")
 export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
 

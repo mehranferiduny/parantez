@@ -5,7 +5,6 @@ import { ChenageEmailDto, ChenagePhoneDto, ChenageUsernameDto, ProfileDto } from
 import { SwaggerConsumes } from 'src/common/enums/swagger-consumes.enum';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { malterStoreg } from 'src/common/utils/multer.util';
-import { AuthGuard } from '../auth/guards/auth.guard';
 import {  UploadedOptionFile } from 'src/common/decorators/uploadfile.decorator';
 import { ImageProfile } from './types/files';
 import { Response } from 'express';
@@ -13,11 +12,10 @@ import { CookieKeys } from 'src/common/enums/cookie.enum';
 import { CookieOptionToken } from 'src/common/utils/cookie.util';
 import { AuthMassege, PublicMassege } from 'src/common/enums/message.enum';
 import { ChekOtpDto } from '../auth/dto/auth.dto';
+import { AuthDecorator } from 'src/common/decorators/auth.decorator';
 
 @Controller('user')
-@ApiTags("User")
-@ApiBearerAuth('Authuriztion')
-@UseGuards(AuthGuard)
+@AuthDecorator("User")
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
