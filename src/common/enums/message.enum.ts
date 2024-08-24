@@ -46,5 +46,6 @@ export enum NotFindMassege{
   NotCategory="دسته بندی یافت نشد!",
   NotPost="مقاله ای یافت نشد!",
   NotUser="کاربری یافت نشد!",
-  NotComment="دیدگاهی بافت نشد"
+  NotComment="دیدگاهی بافت نشد",
+  NotFound="موردی بافت نشد"
 }
