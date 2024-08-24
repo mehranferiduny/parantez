@@ -1,7 +1,7 @@
 import { BassEntity } from "src/common/abestracs/bass.entity";
 import { EntityName } from "src/common/enums/entity.enum";
 import { UserEntity } from "src/modules/user/entites/user.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne } from "typeorm";
+import { AfterLoad, Column, CreateDateColumn, Entity, ManyToOne } from "typeorm";
 
 @Entity(EntityName.Images)
 export class ImageEntity extends BassEntity {
@@ -17,5 +17,10 @@ export class ImageEntity extends BassEntity {
   created_at:Date
   @ManyToOne(()=>UserEntity,user=>user.image,{onDelete:"CASCADE"})
   user:UserEntity
+
+  @AfterLoad()
+  map(){
+    this.location=`http://localhost:3000/${this.location}`
+  }
   
 }

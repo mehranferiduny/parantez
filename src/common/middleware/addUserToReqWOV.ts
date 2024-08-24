@@ -2,7 +2,7 @@ import { Injectable, NestMiddleware } from "@nestjs/common";
 import { isJWT } from "class-validator";
 import { AuthService } from "src/modules/auth/auth.service";
 import { NextFunction, Request } from "express";
-import { async } from "rxjs";
+
 
 
 @Injectable()

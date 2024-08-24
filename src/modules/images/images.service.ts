@@ -7,13 +7,21 @@ import { Repository } from "typeorm";
 import { REQUEST } from "@nestjs/core";
 import { Request } from "express";
 import { NotFindMassege, PublicMassege } from "src/common/enums/message.enum";
+import { deleteFile } from "src/common/utils/functions.util";
+import * as path from "path";
+
+
 
 
 @Injectable({scope:Scope.REQUEST})
 export class ImagesService {
+
+  
   constructor(
     @InjectRepository(ImageEntity) private readonly imageRepository:Repository<ImageEntity>,
-    @Inject(REQUEST) private readonly req:Request
+    @Inject(REQUEST) private readonly req:Request,
+
+
   ){}
   async create(imageDto: ImageDto,image:MalterFile) {
     const userId= this.req?.user?.id
@@ -48,6 +56,9 @@ export class ImagesService {
 
  async remove(id: number) {
   const image=await this.findOne(id)
+  const image_loc=image.location.slice(22)
+  const fullPath = path.join("public", image_loc);
+  await deleteFile(fullPath)
   await this.imageRepository.remove(image)
     return {
       message:PublicMassege.Deleted
