@@ -1,11 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { ImageDto } from "./dto/image.dto";
+import { MalterFile } from "src/common/utils/multer.util";
 
 
 @Injectable()
 export class ImagesService {
-  create(imageDto: ImageDto) {
-    return "This action adds a new image";
+  create(imageDto: ImageDto,image:MalterFile) {
+    return image;
   }
 
   findAll() {
