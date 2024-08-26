@@ -9,6 +9,7 @@ import { BlogBookmarkEntity } from "src/modules/blog/entities/bookmark.entity";
 import { CommentBlogEntity } from "src/modules/blog/entities/comment.entity";
 import { ImageEntity } from "src/modules/images/entities/image.entity";
 import { Roles } from "src/common/enums/roul.enum";
+import { FollowerEntity } from "./follower.entity";
 
 @Entity(EntityName.User)
 export class UserEntity extends BassEntity{
@@ -58,6 +59,11 @@ export class UserEntity extends BassEntity{
 
    @OneToMany(()=>ImageEntity,image=>image.user,{nullable:true})
    image:ImageEntity[];
+
+   @OneToMany(()=>FollowerEntity,follow=>follow.follower,{nullable:true})
+   follower:FollowerEntity[];
+   @OneToMany(()=>FollowerEntity,follow=>follow.followeing,{nullable:true})
+   followeing:FollowerEntity[];
 
   @CreateDateColumn()
   created_at:Date
