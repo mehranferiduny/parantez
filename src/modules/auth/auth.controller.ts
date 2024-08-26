@@ -30,7 +30,7 @@ export class AuthController {
 
   @Get('check-Login')
   @AuthDecorator("Auth")
-  @CanAcssec(Roles.Admin)
+  // @CanAcssec(Roles.Admin)
   cheackLogin(@Req() req:Request){
     return req.user
   }

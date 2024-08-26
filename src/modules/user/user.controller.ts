@@ -1,6 +1,6 @@
-import { Body, Controller, Get, ParseFilePipe, Patch, Post, Res, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Res, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ChenageEmailDto, ChenagePhoneDto, ChenageUsernameDto, ProfileDto } from './dto/profile.dto';
 import { SwaggerConsumes } from 'src/common/enums/swagger-consumes.enum';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -38,6 +38,10 @@ export class UserController {
   @Get('profile')
   profile(){
     return this.userService.profile()
+  }
+  @Get('list')
+  userListFind(){
+    return this.userService.find()
   }
 
   @Patch("cheng-phone")
@@ -78,5 +82,11 @@ export class UserController {
   @ApiConsumes(SwaggerConsumes.UrlEncoded,SwaggerConsumes.Json)
   chengUsername(@Body() otpUsername:ChenageUsernameDto){
     return this.userService.chenagUsername(otpUsername.username)
+  }
+
+  @Get("follow/:followingId")
+  @ApiParam({name:"followingId"})
+  follow(@Param("followingId",ParseIntPipe) followingId:number){
+    return this.userService.followTigel(followingId)
   }
 }

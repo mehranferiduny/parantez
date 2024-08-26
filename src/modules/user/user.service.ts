@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Inject, Injectable, Scope, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, Scope, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entites/user.entity';
 import { Repository } from 'typeorm';
@@ -9,12 +9,13 @@ import { Request } from 'express';
 import { isDate, IsDate, isEnum } from 'class-validator';
 import { Gender } from './enum/gender.enum';
 import { ImageProfile } from './types/files';
-import { AuthMassege, BadRequestExceptionMasseage, ConflictExceptionMassage, PublicMassege } from 'src/common/enums/message.enum';
+import { AuthMassege, BadRequestExceptionMasseage, ConflictExceptionMassage, NotFindMassege, PublicMassege } from 'src/common/enums/message.enum';
 import { AuthService } from '../auth/auth.service';
 import { TokenServiec } from '../auth/token.service';
 import { AuthMethod } from '../auth/enums/method.enum';
 import { CookieKeys } from 'src/common/enums/cookie.enum';
 import { OtpEntity } from './entites/otp.entity';
+import { FollowerEntity } from './entites/follower.entity';
 
 @Injectable({scope:Scope.REQUEST})
 export class UserService {
@@ -23,6 +24,7 @@ export class UserService {
     @InjectRepository(UserEntity) private readonly userRepositoty:Repository<UserEntity>,
     @InjectRepository(ProfileEntity) private readonly profileRepositoty:Repository<ProfileEntity>,
     @InjectRepository(OtpEntity) private readonly otpRepository:Repository<OtpEntity>,
+    @InjectRepository(FollowerEntity) private readonly followRepository:Repository<FollowerEntity>,
     @Inject(REQUEST) private readonly req:Request,
     private readonly authService:AuthService,
     private readonly tokenService:TokenServiec
@@ -77,6 +79,10 @@ export class UserService {
     }
   }
 
+  find(){
+  
+    return this.userRepositoty.find({})
+  }
   profile(){
     const {id}=this.req.user
     return this.userRepositoty.findOne({
@@ -194,6 +200,27 @@ export class UserService {
     })
     return {
       message:PublicMassege.Updaeted 
+    }
+  }
+
+  async followTigel(followigId:number){
+    const {id:userId}=this.req.user
+    const follow=await this.userRepositoty.findOneBy({id:followigId})
+    if(!follow) throw new NotFoundException(NotFindMassege.NotUser)
+      const isFollow=await this.followRepository.findOneBy({followeingId:followigId,followerId:userId})
+    let message=PublicMassege.Follow
+    if(isFollow){
+   
+         await this.followRepository.remove(isFollow)
+         message=PublicMassege.Unfollow
+    }else{
+         await this.followRepository.insert({
+          followeingId:followigId,
+          followerId:userId
+         })
+    }
+    return{
+      message
     }
   }
 }
