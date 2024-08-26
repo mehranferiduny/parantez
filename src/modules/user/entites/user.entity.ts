@@ -8,6 +8,7 @@ import { BlogLikeEntity } from "src/modules/blog/entities/like.entity";
 import { BlogBookmarkEntity } from "src/modules/blog/entities/bookmark.entity";
 import { CommentBlogEntity } from "src/modules/blog/entities/comment.entity";
 import { ImageEntity } from "src/modules/images/entities/image.entity";
+import { Roles } from "src/common/enums/roul.enum";
 
 @Entity(EntityName.User)
 export class UserEntity extends BassEntity{
@@ -26,6 +27,8 @@ export class UserEntity extends BassEntity{
   verify_phone:boolean
   @Column({unique:true,nullable:true})
   username:string
+  @Column({default:Roles.User})
+  roles:string
   @Column({nullable:true})
   password:string
   @Column({nullable:true})

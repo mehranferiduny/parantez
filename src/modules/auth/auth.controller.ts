@@ -5,6 +5,9 @@ import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { SwaggerConsumes } from 'src/common/enums/swagger-consumes.enum';
 import { Request, Response } from 'express';
 import { AuthGuard } from './guards/auth.guard';
+import { AuthDecorator } from 'src/common/decorators/auth.decorator';
+import { CanAcssec } from 'src/common/decorators/roles.decorator';
+import { Roles } from 'src/common/enums/roul.enum';
 
 
 @Controller('auth')
@@ -26,8 +29,8 @@ export class AuthController {
   }
 
   @Get('check-Login')
-  @ApiBearerAuth('Authuriztion')
-  @UseGuards(AuthGuard)
+  @AuthDecorator("Auth")
+  @CanAcssec(Roles.Admin)
   cheackLogin(@Req() req:Request){
     return req.user
   }
