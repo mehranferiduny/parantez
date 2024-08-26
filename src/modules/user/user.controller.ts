@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Res, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Query, Res, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ChenageEmailDto, ChenagePhoneDto, ChenageUsernameDto, ProfileDto } from './dto/profile.dto';
@@ -13,6 +13,8 @@ import { CookieOptionToken } from 'src/common/utils/cookie.util';
 import { AuthMassege, PublicMassege } from 'src/common/enums/message.enum';
 import { ChekOtpDto } from '../auth/dto/auth.dto';
 import { AuthDecorator } from 'src/common/decorators/auth.decorator';
+import { Pagination } from 'src/common/decorators/paginashen.decorator';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 @Controller('user')
 @AuthDecorator("User")
@@ -40,8 +42,19 @@ export class UserController {
     return this.userService.profile()
   }
   @Get('list')
-  userListFind(){
-    return this.userService.find()
+  @Pagination()
+  userListFind(@Query() paginationDto:PaginationDto ){
+    return this.userService.find(paginationDto)
+  }
+  @Get('follower')
+  @Pagination()
+  follower(@Query() paginationDto:PaginationDto ){
+    return this.userService.follower(paginationDto)
+  }
+  @Get('following')
+  @Pagination()
+  following(@Query() paginationDto:PaginationDto ){
+    return this.userService.following(paginationDto)
   }
 
   @Patch("cheng-phone")

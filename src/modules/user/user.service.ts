@@ -16,6 +16,9 @@ import { AuthMethod } from '../auth/enums/method.enum';
 import { CookieKeys } from 'src/common/enums/cookie.enum';
 import { OtpEntity } from './entites/otp.entity';
 import { FollowerEntity } from './entites/follower.entity';
+import { EntityName } from 'src/common/enums/entity.enum';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { PagitionGeneritor, PagitionSolver } from 'src/common/utils/pagintion.util';
 
 @Injectable({scope:Scope.REQUEST})
 export class UserService {
@@ -79,16 +82,98 @@ export class UserService {
     }
   }
 
-  find(){
-  
-    return this.userRepositoty.find({})
+  async find(paginationDto:PaginationDto){
+   const{limit,page,skip}=PagitionSolver(paginationDto)
+    const[users,count]=await this.userRepositoty.findAndCount({
+      where:{},
+      skip,
+      take:limit
+    })
+
+ return{
+  pagination:PagitionGeneritor(page,limit,count),
+  users
+ }
+
   }
+
+
+  async following(paginationDto:PaginationDto){
+   const{limit,page,skip}=PagitionSolver(paginationDto)
+   const {id:userId}=this.req.user
+    const[following,count]=await this.followRepository.findAndCount({
+      where:{followerId:userId},
+      relations:{
+        followeing:{
+          profile:true
+        }
+      },
+      select:{
+        id:true,
+        followeing:{
+          id:true,
+          username:true,
+          profile:{
+            nik_name:true,
+            imag_profile:true,
+            bio:true
+          }
+
+        }
+      },
+      skip,
+      take:limit
+    })
+
+ return{
+  pagination:PagitionGeneritor(page,limit,count),
+  following
+ }
+
+  }
+  async follower(paginationDto:PaginationDto){
+   const{limit,page,skip}=PagitionSolver(paginationDto)
+   const {id:userId}=this.req.user
+    const[follower,count]=await this.followRepository.findAndCount({
+      where:{followeingId:userId},
+      relations:{
+        follower:{
+          profile:true
+        }
+      },
+      select:{
+        id:true,
+        follower:{
+          id:true,
+          username:true,
+          profile:{
+            nik_name:true,
+            imag_profile:true,
+            bio:true
+          }
+
+        }
+      },
+      skip,
+      take:limit
+    })
+
+ return{
+  pagination:PagitionGeneritor(page,limit,count),
+  follower
+ }
+
+  }
+
+
   profile(){
     const {id}=this.req.user
-    return this.userRepositoty.findOne({
-      where:{id},
-      relations:['profile']
-    })
+    return this.userRepositoty.createQueryBuilder(EntityName.User)
+    .where({id})
+    .leftJoinAndSelect("user.profile","profile")
+    .loadRelationCountAndMap("user.follower","user.follower")
+    .loadRelationCountAndMap("user.followeing","user.followeing")
+    .getOne()
   }
 
   async chenagePhone(phone:string){
@@ -207,6 +292,7 @@ export class UserService {
     const {id:userId}=this.req.user
     const follow=await this.userRepositoty.findOneBy({id:followigId})
     if(!follow) throw new NotFoundException(NotFindMassege.NotUser)
+      if(followigId === userId ) throw new BadRequestException(BadRequestExceptionMasseage.BatTryAgen)
       const isFollow=await this.followRepository.findOneBy({followeingId:followigId,followerId:userId})
     let message=PublicMassege.Follow
     if(isFollow){

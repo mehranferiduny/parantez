@@ -60,9 +60,9 @@ export class UserEntity extends BassEntity{
    @OneToMany(()=>ImageEntity,image=>image.user,{nullable:true})
    image:ImageEntity[];
 
-   @OneToMany(()=>FollowerEntity,follow=>follow.follower,{nullable:true})
-   follower:FollowerEntity[];
    @OneToMany(()=>FollowerEntity,follow=>follow.followeing,{nullable:true})
+   follower:FollowerEntity[];
+   @OneToMany(()=>FollowerEntity,follow=>follow.follower,{nullable:true})
    followeing:FollowerEntity[];
 
   @CreateDateColumn()
