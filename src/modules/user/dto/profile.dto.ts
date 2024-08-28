@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
-import { IsEmail, IsEnum, IsMobilePhone, IsOptional, IsString, Length } from "class-validator"
+import { IsEmail, IsEnum, IsMobilePhone, IsNumberString, IsOptional, IsString, Length } from "class-validator"
 import { Gender } from "../enum/gender.enum"
 import { InvalidFormatMassage } from "src/common/enums/message.enum"
 
@@ -52,4 +52,9 @@ export class ChenageUsernameDto{
   @IsString()
   @Length(3,100)
   username:string
+}
+export class UserBlockDto{
+  @ApiProperty()
+  @IsNumberString()
+  userId:number
 }

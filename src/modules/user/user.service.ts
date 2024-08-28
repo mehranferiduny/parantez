@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entites/user.entity';
 import { Repository } from 'typeorm';
 import { ProfileEntity } from './entites/profile.entity';
-import { ProfileDto } from './dto/profile.dto';
+import { ProfileDto, UserBlockDto } from './dto/profile.dto';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { isDate, IsDate, isEnum } from 'class-validator';
@@ -19,6 +19,7 @@ import { FollowerEntity } from './entites/follower.entity';
 import { EntityName } from 'src/common/enums/entity.enum';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { PagitionGeneritor, PagitionSolver } from 'src/common/utils/pagintion.util';
+import { UserStatus } from './enum/status.enum';
 
 @Injectable({scope:Scope.REQUEST})
 export class UserService {
@@ -303,6 +304,27 @@ export class UserService {
          await this.followRepository.insert({
           followeingId:followigId,
           followerId:userId
+         })
+    }
+    return{
+      message
+    }
+  }
+  async blockTigel(blockDto:UserBlockDto){
+    const {userId}=blockDto
+    const user=await this.userRepositoty.findOneBy({id:userId})
+    if(!user) throw new NotFoundException(NotFindMassege.NotUser)
+      
+    const isBlock=await this.userRepositoty.findOneBy({status:UserStatus.Block})
+    let message=PublicMassege.Block
+    if(isBlock){
+         await this.userRepositoty.update({id:userId},{status:UserStatus.Active})
+         message=PublicMassege.Unblock
+    }else{
+         await this.userRepositoty.update({
+          id:userId
+         },{
+          status:UserStatus.Block
          })
     }
     return{

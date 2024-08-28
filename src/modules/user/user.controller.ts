@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Query, Res, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
-import { ChenageEmailDto, ChenagePhoneDto, ChenageUsernameDto, ProfileDto } from './dto/profile.dto';
+import { ChenageEmailDto, ChenagePhoneDto, ChenageUsernameDto, ProfileDto, UserBlockDto } from './dto/profile.dto';
 import { SwaggerConsumes } from 'src/common/enums/swagger-consumes.enum';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { malterStoreg } from 'src/common/utils/multer.util';
@@ -15,6 +15,8 @@ import { ChekOtpDto } from '../auth/dto/auth.dto';
 import { AuthDecorator } from 'src/common/decorators/auth.decorator';
 import { Pagination } from 'src/common/decorators/paginashen.decorator';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { CanAcssec } from 'src/common/decorators/roles.decorator';
+import { Roles } from 'src/common/enums/roul.enum';
 
 @Controller('user')
 @AuthDecorator("User")
@@ -90,6 +92,12 @@ export class UserController {
   @ApiConsumes(SwaggerConsumes.UrlEncoded,SwaggerConsumes.Json)
   verifayEmail(@Body() otpEmail:ChekOtpDto){
     return this.userService.verifyEmail(otpEmail.code)
+  }
+  @Post('block-unbloc')
+  @CanAcssec(Roles.Admin)
+  @ApiConsumes(SwaggerConsumes.UrlEncoded,SwaggerConsumes.Json)
+  blockToggel(@Body() blockDto:UserBlockDto){
+    return this.userService.blockTigel(blockDto)
   }
   @Patch('cheng-username')
   @ApiConsumes(SwaggerConsumes.UrlEncoded,SwaggerConsumes.Json)

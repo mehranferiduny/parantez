@@ -10,6 +10,7 @@ import { CommentBlogEntity } from "src/modules/blog/entities/comment.entity";
 import { ImageEntity } from "src/modules/images/entities/image.entity";
 import { Roles } from "src/common/enums/roul.enum";
 import { FollowerEntity } from "./follower.entity";
+import { UserStatus } from "../enum/status.enum";
 
 @Entity(EntityName.User)
 export class UserEntity extends BassEntity{
@@ -30,6 +31,8 @@ export class UserEntity extends BassEntity{
   username:string
   @Column({default:Roles.User})
   roles:string
+  @Column({default:UserStatus.Active})
+  status:string
   @Column({nullable:true})
   password:string
   @Column({nullable:true})
