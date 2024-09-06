@@ -5,10 +5,10 @@ export enum EntityName{
   Otp="otp",
   Category="category",
   Blog="blog",
-  BlogCategory="bolg-category",
-  BlogLike="blog-like",
-  BlogBookmark="blog-bookmark",
-  BlogComments="blog-comments",
+  BlogCategory="blog_category",
+    BlogLikes="blog_likes",
+    BlogComments="blog_comments",
+    BlogBookmark="blog_bookmarks",
   Images="images",
   Follower="follower"
 }

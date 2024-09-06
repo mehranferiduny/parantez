@@ -4,7 +4,7 @@ import { Column, CreateDateColumn, Entity, ManyToOne } from "typeorm";
 import { BlogEntity } from "./blog.entity";
 import { BassEntity } from "src/common/abestracs/bass.entity";
 
-@Entity(EntityName.BlogLike)
+@Entity(EntityName.BlogLikes)
 export class BlogLikeEntity extends BassEntity{
   @Column()
   userId:number

@@ -7,7 +7,7 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { BlogEntity } from "../entities/blog.entity";
-import { FindOptionsWhere, Repository } from "typeorm";
+import { DataSource, FindOptionsWhere, Repository } from "typeorm";
 import { CreateBlogDto, FilterBlogDto, UpdeatBlogDto } from "../dto/blog.dto";
 import { createSlug, RandumId } from "src/common/utils/functions.util";
 import { REQUEST } from "@nestjs/core";
@@ -44,7 +44,8 @@ export class BlogService {
     private readonly blogBookmarkRepository: Repository<BlogBookmarkEntity>,
     @Inject(REQUEST) private readonly req: Request,
     private readonly categoryServis: CategoryService,
-    private readonly commentServis: BlogCommentService
+    private readonly commentServis: BlogCommentService,
+    private readonly dataSource: DataSource
   ) {}
 
   //!Create Blog
@@ -168,8 +169,11 @@ export class BlogService {
       .where(where, { category, search })
       .loadRelationCountAndMap("blog.likes", "blog.likes")
       .loadRelationCountAndMap("blog.bookmark", "blog.bookmark")
-      .loadRelationCountAndMap("blog.comment", "blog.comment",'comment', qb=>
-        qb.where("comment.acseped = :acseped",{acseped:true})
+      .loadRelationCountAndMap(
+        "blog.comment",
+        "blog.comment",
+        "comment",
+        (qb) => qb.where("comment.acseped = :acseped", { acseped: true })
       )
       .orderBy("blog.id", "DESC")
       .take(limit)
@@ -318,44 +322,97 @@ export class BlogService {
     return { massege };
   }
 
+  async findOneBySlug(pagintinDto: PaginationDto, slug: string) {
+    const userId = this.req?.user?.id;
+    const blog = await this.blogRepository
+      .createQueryBuilder(EntityName.Blog)
+      .leftJoin("blog.categoris", "categoris")
+      .leftJoin("categoris.category", "category")
+      .leftJoin("blog.author", "auther")
+      .leftJoin("auther.profile", "profile")
+      .addSelect([
+        "categoris.id",
+        "category.title",
+        "auther.username",
+        "auther.id",
+        "profile.nik_name",
+      ])
+      .where({ slug })
+      .loadRelationCountAndMap("blog.likes", "blog.likes")
+      .loadRelationCountAndMap("blog.bookmark", "blog.bookmark")
+      .getOne();
 
-  async findOneBySlug(pagintinDto: PaginationDto,slug:string){
-    const userId=this.req?.user?.id;
-    const blog= await this.blogRepository
-    .createQueryBuilder(EntityName.Blog)
-    .leftJoin("blog.categoris", "categoris")
-    .leftJoin("categoris.category", "category")
-    .leftJoin("blog.author", "auther")
-    .leftJoin("auther.profile", "profile")
-    .addSelect([
-      "categoris.id",
-      "category.title",
-      "auther.username",
-      "auther.id",
-      "profile.nik_name",
-    ])
-    .where({ slug })
-    .loadRelationCountAndMap("blog.likes", "blog.likes")
-    .loadRelationCountAndMap("blog.bookmark", "blog.bookmark")
-    .getOne();
+    if (!blog) throw new NotFoundException(NotFindMassege.NotPost);
+    const commentData = await this.commentServis.findCommentsOfBlog(
+      pagintinDto,
+      blog.id
+    );
 
-    if(!blog) throw new NotFoundException(NotFindMassege.NotPost)
-    const commentData=await this.commentServis.findCommentsOfBlog(pagintinDto,blog.id)
+    let isLiked = false;
+    let isBookmarked = false;
 
-    let isLiked=false
-    let isBookmarked=false
-
-    if(userId && !isNaN(userId) && userId > 0){
-      isLiked=!!(await this.blogLikeRepository.findOneBy({userId,blogId:blog.id})) 
-      isBookmarked=!!(await this.blogBookmarkRepository.findOneBy({userId,blogId:blog.id})) 
-     
+    if (userId && !isNaN(userId) && userId > 0) {
+      isLiked = !!(await this.blogLikeRepository.findOneBy({
+        userId,
+        blogId: blog.id,
+      }));
+      isBookmarked = !!(await this.blogBookmarkRepository.findOneBy({
+        userId,
+        blogId: blog.id,
+      }));
     }
-     
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    const suggestBlogs = await queryRunner.query(`
+        WITH suggested_blogs AS (
+            SELECT 
+                    blog.id,
+                    blog.slug,
+                    blog.title,
+                    blog.description,
+                    blog.time_for_stady,
+                    blog.image,
+                     json_build_object(
+                        'username', u.username,
+                        'author_name', p.nik_name,
+                        'image', p.imag_profile
+                    ) AS author,
+                    array_agg(DISTINCT cat.title) AS category,
+                      (
+                        SELECT COUNT(*) FROM blog_likes
+                        WHERE blog_likes."blogId" = blog.id
+                    ) AS likes,
+                    (
+                        SELECT COUNT(*) FROM blog_bookmarks
+                        WHERE blog_bookmarks."blogId" = blog.id
+                    ) AS bookmarks,
+                    (
+                        SELECT COUNT(*) FROM blog_comments
+                        WHERE blog_comments."blogId" = blog.id
+                    ) AS comments
+                     
+
+           FROM blog
+           LEFT JOIN public.user u ON blog."authorId" = u.id
+                LEFT JOIN profile p ON p."userId" = u.id
+                LEFT JOIN blog_category bc ON blog.id = bc."blogId"
+                LEFT JOIN category cat ON bc."categoryId" = cat.id
+                GROUP BY blog.id, u.username, p.nik_name, p.imag_profile
+                
+            ORDER BY RANDOM()
+            LIMIT 3
+
+        )
+        SELECT * FROM suggested_blogs
+    `);
+
     return {
       blog,
       isLiked,
       isBookmarked,
-      commentData
-    }
+      commentData,
+      suggestBlogs,
+    };
   }
 }
