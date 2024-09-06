@@ -22,7 +22,6 @@ export class AuthGuard implements CanActivate{
     const token=this.extractToken(request)
     
     request.user= await this.authServis.validatToken(token)
-
     if(request?.user?.status== UserStatus.Block){
       throw new ForbiddenException(AuthMassege.BlockUser)
     }

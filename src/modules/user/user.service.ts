@@ -43,7 +43,7 @@ export class UserService {
       let[image]=file?.imag_profile
       profileDto.imag_profile=image?.path?.slice(7)
     }
-
+   
     const {id:userId,profileId}=this.req.user;
     let profile=await this.profileRepositoty.findOneBy({userId})
     const {bio,birthday,gander,linkdin_profile

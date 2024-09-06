@@ -12,10 +12,11 @@ import { randomInt } from 'crypto';
 import { OtpEntity } from '../user/entites/otp.entity';
 import { TokenServiec } from './token.service';
 import { Request, Response } from 'express';
-import { AuthRespons } from './types/response';
+import { AuthRespons, UserAuth } from './types/response';
 import { CookieKeys } from 'src/common/enums/cookie.enum';
 import { REQUEST } from '@nestjs/core';
 import { CookieOptionToken } from 'src/common/utils/cookie.util';
+import { RandumId } from 'src/common/utils/functions.util';
 
 @Injectable({scope:Scope.REQUEST})
 export class AuthService {
@@ -166,5 +167,33 @@ export class AuthService {
     const user= await this.userRepository.findOneBy({id:userId})
     if(!user) throw new UnauthorizedException(PublicMassege.TryLogin)
       return user
+  }
+
+  async userLoginOAuth(userData:UserAuth){
+    const {email,fristName,lastName}=userData
+    let token:string
+    let user=await this.userRepository.findOneBy({email})
+    if(user){
+      token=this.tokenServiec.craeteToken({userId:user.id})
+    }else{
+       user=this.userRepository.create({
+        email,
+        verify_email:true,
+        username:email.split("@")[0]+RandumId()
+      })
+      user=await this.userRepository.save(user)
+      let profile=this.profileRepository.create({
+        userId:user.id,
+        nik_name:`${fristName}_${lastName}`
+      })
+      profile=await this.profileRepository.save(profile)
+      user.profileId=profile.id
+      await this.userRepository.save(user)
+      token=await this.tokenServiec.craeteAcssesToken({userId:user.id})
+    }
+      return{
+        token
+      }
+    
   }
 }

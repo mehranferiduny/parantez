@@ -20,7 +20,7 @@ export class RolleGuard implements CanActivate{
       ])
     if(!RequardRoll || RequardRoll.length == 0) return true;
     const request:Request=context.switchToHttp().getRequest<Request>();
-    const user=request.user;
+    const user=request.user
     const userRolle=user?.roles ?? Roles.User;
     if(user.roles === Roles.Admin) return true
     if(RequardRoll.includes(userRolle as Roles)) return true

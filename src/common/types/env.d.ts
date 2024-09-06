@@ -16,6 +16,9 @@ namespace NodeJS{
     JWT_SECRET_ACSSES:string
     JWT_SECRET_EMAIL:string
     JWT_SECRET_PHONE:string
+    //!OAuth
+    GOOGLE_CLIENT_ID:string
+    GOOGLE_CLINET_SECRET:string
   } 
 }
 
