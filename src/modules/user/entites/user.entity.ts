@@ -25,6 +25,8 @@ export class UserEntity extends BassEntity{
   phone:string
   @Column({nullable:true})
   new_phone:string
+  @Column({nullable:true,type:'numeric',default:0})
+  balance:number
   @Column({nullable:true,default:false})
   verify_phone:boolean
   @Column({unique:true,nullable:true})

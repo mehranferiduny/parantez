@@ -22,13 +22,19 @@ export class  $npmConfigName1726122267277 implements MigrationInterface {
                     {name:"roles",type:"enum",enum:[Roles.Admin,Roles.User],isNullable:false},
                     {name:"status",type:"enum",enum:[UserStatus.Active,UserStatus.Block,UserStatus.Report],isNullable:true},
                     {name:"created_at",type:"timestamp",default:"now()"},
-                ]
+                ],
+                
             })
-        )
+        ,true)
+
+        const balance=await queryRunner.hasColumn(EntityName.User,'balance')
+        //@ts-ignore
+        if(!balance) await queryRunner.addColumn(EntityName.User,{name:'balance',type:'numeric',default:0})
 
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        // await queryRunner.dropColumn(EntityName.User,"balance")
         await queryRunner.dropTable(EntityName.User,true)
     }
 
