@@ -9,7 +9,11 @@ export function typeOrmConfig ():TypeOrmModuleOptions{
     username:DB_USERNAME,
     password:DB_PASSWORD,
     database:DB_NAME,
-    autoLoadEntities:true,
-    synchronize:true
+    autoLoadEntities:false,
+    synchronize:false,
+    entities: [
+      "dist/**/**/**/*.entity{.ts,.js}",
+      "dist/**/**/*.entity{.ts,.js}"
+  ],
   }
 }
