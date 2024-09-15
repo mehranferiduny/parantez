@@ -31,13 +31,15 @@ export class  $npmConfigName1726122267277 implements MigrationInterface {
         // //@ts-ignore
         // if(!balance) await queryRunner.addColumn(EntityName.User,{name:'balance',type:'numeric',default:0})
 
-        const username=await queryRunner.hasColumn(EntityName.User,"username")
-        if(username) await queryRunner.changeColumn(EntityName.User,"username",new TableColumn({
-            name:"username",
-            type:"varchar(60)",
-            isNullable:false,
-            isUnique:true
-        }))
+        // const username=await queryRunner.hasColumn(EntityName.User,"username")
+        // if(username) await queryRunner.changeColumn(EntityName.User,"username",new TableColumn({
+        //     name:"username",
+        //     type:"varchar(60)",
+        //     isNullable:false,
+        //     isUnique:true
+        // }))
+
+        await queryRunner.query(`ALTER TABLE "user" RENAME COLUMN "mobile" TO "phone"`)
 
     }
 
